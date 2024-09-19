@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/">
+    <file>img/popup_boundary.png</file>
+    <file>img/popup_obstale.png</file>
+    <file>img/current.png</file>
+    <file>img/start_btn.png</file>
+  </qresource>
+</RCC>
