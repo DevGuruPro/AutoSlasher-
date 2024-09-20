@@ -2,13 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 import networkx as nx
-from rtree import index
-from collections import deque
-from shapely.strtree import STRtree
 from shapely.affinity import scale
-import matplotlib.animation as animation 
+import matplotlib.animation as animation
 
-class PolygonDrawer:  
+
+class PolygonDrawer:
     def __init__(self):  
         self.fig, self.ax = plt.subplots(figsize=(5, 5), dpi=100)  # 5x5 inches at 100 dpi is 500x500 pixels  
         self.ax.set_xlim(0, 500)  # Set x-axis limit  
@@ -20,7 +18,7 @@ class PolygonDrawer:
         self.obstacles = []  
         self.current_polygon = []  
 
-        self.cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)  
+        self.cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.temp_line = None  
 
     def onclick(self, event):  
