@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt  
 import numpy as np
-from shapely.geometry import Polygon, Point, LineString
+from shapely.geometry import Polygon, Point, LineString, box
 import networkx as nx
 from shapely.affinity import scale
 import matplotlib.animation as animation
@@ -117,18 +117,17 @@ def shrink_polygon_uniform(polygon_coords, distance):
     # Create a new polygon with the new coordinates  
     smaller_polygon = Polygon(new_coords)  
     
-    return smaller_polygon  
+    return smaller_polygon
 
-def compute_scaling_factor(polygon, reduction):  
-    centroid = polygon.centroid  
-    point_on_boundary = polygon.exterior.coords[0]  
-    original_distance = centroid.distance(Point(point_on_boundary))  
-    scaled_distance = original_distance - reduction  
-    
-    # The scale factor to reduce the distance by a fixed amount  
-    scaling_factor = scaled_distance / original_distance  
-    return scaling_factor  
+import numpy as np  
+import networkx as nx  
+from shapely.geometry import Point, LineString, box  
 
+# Inflate obstacles to ensure a safety margin around them  
+def inflate_obstacles(obstacles, inflation_distance):  
+    return [obs.buffer(inflation_distance) for obs in obstacles]  
+
+# Create the grid points based on boundary and grid size, avoiding obstacles  
 def create_grid(boundary, obstacles, grid_size):  
     min_x, min_y, max_x, max_y = boundary.bounds  
     x = np.arange(min_x, max_x, grid_size)  
@@ -137,66 +136,82 @@ def create_grid(boundary, obstacles, grid_size):
 
     for i in x:  
         for j in y:  
-            cell = Polygon([  
-                (i, j),  
-                (i + grid_size, j),  
-                (i + grid_size, j + grid_size),  
-                (i, j + grid_size)  
-            ])  
+            point = Point(i + grid_size / 2, j + grid_size / 2)  
+            cell = box(i, j, i + grid_size, j + grid_size)  
             if boundary.contains(cell) and all(not cell.intersects(obs) for obs in obstacles):  
-                grid_points.append((i + grid_size / 2, j + grid_size / 2))  
-    
+                grid_points.append(point)  
+
     return grid_points  
 
+# Check if the direct line between two points is visible (unobstructed by obstacles) and fully inside the boundary  
 def is_visible(point1, point2, obstacles, boundary):  
     line = LineString([point1, point2])  
-    
     if not boundary.contains(line):  
         return False  
-    
-    for obs in obstacles:  
-        if line.intersects(obs):  
+    for obstacle in obstacles:  
+        if line.intersects(obstacle):  
             return False  
-
     return True  
 
+# Create a visibility graph (only if points can be connected directly without obstacles)  
 def create_visibility_graph(grid_points, obstacles, boundary):  
     G = nx.Graph()  
-    for p1 in grid_points:  
-        for p2 in grid_points:  
-            if p1 != p2 and is_visible(p1, p2, obstacles, boundary):  
-                G.add_edge(p1, p2, weight=np.linalg.norm(np.array(p1) - np.array(p2)))  
+    for i, p1 in enumerate(grid_points):  
+        for p2 in grid_points[i+1:]:  
+            if is_visible(p1, p2, obstacles, boundary):  
+                G.add_edge(p1, p2, weight=np.linalg.norm(np.array(p1.coords[0]) - np.array(p2.coords[0])))  
     return G  
 
+# Find the shortest path in the visibility graph, if exists  
 def find_path(graph, start, end):  
     try:  
-        path = nx.shortest_path(graph, source=start, target=end, weight='weight')  
-        return path  
+        return nx.shortest_path(graph, source=start, target=end, weight='weight')  
     except nx.NetworkXNoPath:  
         return []  
 
+# Implement the main function to cover the grid  
 def create_coverage_path(grid_points, obstacles, boundary, grid_size):  
+    def validate_line(line):  
+        return boundary.contains(line) and not line.crosses(boundary.exterior) and all(not line.intersects(obs) for obs in obstacles)  
+
+    def validate_path(temp_path):  
+        for p1, p2 in zip(temp_path[:-1], temp_path[1:]):  
+            if not validate_line(LineString([p1, p2])):  
+                return False  
+        return True  
+
+    # Create visibility graph  
     G = create_visibility_graph(grid_points, obstacles, boundary)  
+    
     path = []  
     visited = set()  
-    
-    num_columns = int((max(grid_points, key=lambda x: x[0])[0] - min(grid_points, key=lambda x: x[0])[0]) / grid_size) + 1  
 
-    for i in range(num_columns):  
-        column_points = [p for p in grid_points if abs(p[0] - (min(grid_points, key=lambda x: x[0])[0] + i * grid_size)) < grid_size / 2]  
-        column_points = sorted(column_points, key=lambda x: x[1])  
+    # Choose the initial point  
+    current_point = min(grid_points, key=lambda p: (p.x, p.y))  
+    visited.add(current_point)  
+    path.append(current_point.coords[0])  
+    
+    while len(visited) < len(grid_points):  
+        neighbors = sorted(  
+            [p for p in grid_points if p not in visited],  
+            key=lambda p: np.linalg.norm(np.array(current_point.coords[0]) - np.array(p.coords[0])))  
+
+        found_next = False  
+        for neighbor in neighbors:  
+            temp_path = find_path(G, current_point, neighbor)  
+            if temp_path and validate_path(temp_path):  
+                for pt in temp_path:  
+                    if pt not in visited:  
+                        path.append(pt.coords[0])  
+                        visited.add(pt)  
+                        current_point = pt  
+                    else:  
+                        path.append(pt.coords[0])  # Allow revisits  
+                found_next = True  
+                break  
         
-        if i % 2 == 1:  
-            column_points.reverse()  
-        
-        for j in range(len(column_points)):  
-            if column_points[j] not in visited:  
-                if path:  
-                    part_path = find_path(G, path[-1], column_points[j])  
-                    path.extend(part_path[1:] if part_path else [])  
-                else:  
-                    path.append(column_points[j])  
-                visited.add(column_points[j])  
+        if not found_next:  
+            break  # If no valid path to unvisited neighbors is found  
     
     return path
 
@@ -220,7 +235,7 @@ def plot_boundary_obstacles_path(boundary, sm_boundary, obstacles, covering_path
     if covering_path:  
         path_x, path_y = zip(*covering_path)  
         ax.plot(path_x, path_y, color='orange', linewidth=1, label='Covering Path')
-        # ax.plot(path_x, path_y, 'ro')
+        ax.plot(path_x, path_y, 'ro')  
 
     # Labels and legend  
     ax.set_xlim(boundary.bounds[0] - 1, boundary.bounds[2] + 1)  
