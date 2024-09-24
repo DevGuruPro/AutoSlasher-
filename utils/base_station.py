@@ -1,21 +1,18 @@
 import serial
+import time
 
-from settings import base_port
-
-
-def stream_rtcm(base_serial):
-    while True:
-        data = base_serial.read(1000)
-        print(data)
+def read_continuously(port_name):
+    try:
+        with serial.Serial(port_name, baudrate=38400, timeout=1) as ser:
+            print(f"Reading continuous data from {port_name}...")
+            while True:
+                line = ser.readline().decode('ascii', errors='ignore').strip()
+                if line:
+                    print(f"Data: {line}")
+    except serial.SerialException as e:
+        print(f"Error reading from {port_name}: {e}")
 
 
 if __name__ == "__main__":
-
-    base_serial = serial.Serial(base_port, baudrate=38400, timeout=1)
-
-    try:
-        stream_rtcm(base_serial)
-    except KeyboardInterrupt:
-        print("Stopping RTCM streaming.")
-    finally:
-        base_serial.close()
+    port_name = '/dev/ttyUSB0'  # Replace with the actual port
+    read_continuously(port_name)
