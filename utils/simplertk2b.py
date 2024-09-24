@@ -7,14 +7,21 @@ baud_rate = 115200  # Change to the baud rate configured on your simpleRTK2B
 
 
 def read_serial_data():
+    data = {}
     try:
         with serial.Serial(serial_port, baud_rate, timeout=1) as ser:
             while True:
                 line = ser.readline().decode('utf-8', errors='ignore').strip()
-                if line:
+                if line.startswith('$GNGGA'):
                     try:
                         msg = pynmea2.parse(line)
-                        print(msg)
+                        for field in msg.fields:
+                            label, attr = field[:2]
+                            value = getattr(msg, attr)
+                            data[attr] = value
+                        print(data)
+                        fixed_state = data.get("gps_qual") in [4, 5]
+                        print(f"State:{fixed_state}")
                     except pynmea2.ParseError as e:
                         print(f"Parse error: {e}")
     except Exception as e:
