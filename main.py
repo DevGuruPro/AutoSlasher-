@@ -5,6 +5,8 @@ from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from ui.ui_as import Ui_AS
+
+from widget.loadingDlg import LoadingDlg
 from widget.popup import RecordingPopup
 
 
@@ -22,7 +24,9 @@ class AutoSlasher(QMainWindow):
         self.ui.combo_field.addItem("Option 3")
         self.ui.combo_field.currentIndexChanged.connect(self.handle_activated)
 
-        RecordingPopup(self).show()
+        LoadingDlg(self).show()
+
+        # RecordingPopup(self).show()
 
     def handle_activated(self, index):
         print(index)
