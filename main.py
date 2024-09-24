@@ -24,7 +24,7 @@ class AutoSlasher(QMainWindow):
         self.ui.combo_field.addItem("Option 3")
         self.ui.combo_field.currentIndexChanged.connect(self.handle_activated)
 
-        LoadingDlg(self).show()
+        # LoadingDlg(self).show()
 
         # RecordingPopup(self).show()
 
