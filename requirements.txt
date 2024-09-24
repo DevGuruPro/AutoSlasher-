@@ -4,3 +4,4 @@ matplotlib
 networkx
 shapely
 serial
+pynmea2
