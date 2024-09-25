@@ -1,9 +1,8 @@
 import serial
 import pynmea2
 
-# Replace '/dev/ttyACM0' with your device name (e.g., '/dev/ttyUSB0') and set the correct baud rate
-serial_port = '/dev/ttyACM0'
-baud_rate = 115200  # Change to the baud rate configured on your simpleRTK2B
+serial_port = '/dev/serial0'
+baud_rate = 115200
 
 
 def read_serial_data():
@@ -20,8 +19,6 @@ def read_serial_data():
                             value = getattr(msg, attr)
                             data[attr] = value
                         print(data)
-                        fixed_state = data.get("gps_qual") in [4, 5]
-                        print(f"State:{fixed_state}")
                     except pynmea2.ParseError as e:
                         print(f"Parse error: {e}")
     except Exception as e:
