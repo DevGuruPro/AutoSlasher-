@@ -1,7 +1,7 @@
 import serial
 import pynmea2
 
-serial_port = '/dev/serial0'
+serial_port = '/dev/ttyAMA0'
 baud_rate = 115200
 
 
