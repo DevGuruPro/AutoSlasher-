@@ -1,5 +1,8 @@
 import serial
 import pynmea2
+from extractLocation import extract_from_gps
+
+from utils.logger import logger
 
 serial_port = '/dev/ttyAMA0'
 baud_rate = 115200
@@ -18,11 +21,12 @@ def read_serial_data():
                             label, attr = field[:2]
                             value = getattr(msg, attr)
                             data[attr] = value
-                        print(data)
+                        x, y = extract_from_gps(data)
+                        logger.info(f"Location : {x},{y}")
                     except pynmea2.ParseError as e:
-                        print(f"Parse error: {e}")
+                        logger.error(f"Parse error: {e}")
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
 
 
 if __name__ == '__main__':

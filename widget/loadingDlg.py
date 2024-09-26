@@ -8,6 +8,7 @@ from ui.dialog.ui_loadingDlg import Ui_LoadingDialog
 
 import ui.res_rc
 
+
 class LoadingDlg(QDialog):
 
     def __init__(self, app):

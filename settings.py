@@ -17,7 +17,8 @@ if not os.path.exists(CONFIG_FILE):
         json.dump(DEFAULT_CONFIG, jp, indent=2)
 
 
-base_port = '/dev/ttyUSB0'
+serial_port = '/dev/ttyAMA0'
+baud_rate = 115200
 
 Error_MSG = {
     "AutoSlasher is of bounds, manually drive to within the Field Boundary to start the field.",
