@@ -66,7 +66,7 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording boundary...')
         self.gps.start()
 
-        schedule.every(10).seconds.do(lambda: self.save_gps_data(0))
+        schedule.every(5).seconds.do(lambda: self.save_gps_data(0))
         while not self._gps_stop:
             schedule.run_pending()
             time.sleep(2)
@@ -75,7 +75,7 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording obstacle...')
         self.gps.start()
 
-        schedule.every(10).seconds.do(lambda: self.save_gps_data(self.obs_index))
+        schedule.every(5).seconds.do(lambda: self.save_gps_data(self.obs_index))
         while not self._gps_stop:
             schedule.run_pending()
             time.sleep(2)
@@ -94,7 +94,7 @@ class AutoSlasher(QMainWindow):
         gps_data = self.gps.get_data()
         x, y = extract_from_gps(gps_data)
         logger.info(f"Location : {x},{y}")
-        self.field_data[index].append((x, y))
+        self.field_data[index].append((int(x), int(y)))
 
     def save_file(self):
         name_dlg = NameDlg(self)
