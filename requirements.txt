@@ -6,3 +6,4 @@ shapely
 serial
 pynmea2
 pyproj
+schedule
