@@ -5,7 +5,6 @@ import serial
 import schedule
 import pynmea2
 
-from utils.commons import extract_from_gps
 from utils.logger import logger
 
 
@@ -76,13 +75,3 @@ class GPS(threading.Thread):
     def get_data(self):
         """Returns the latest parsed data."""
         return self._data
-
-
-if __name__ == "__main__":
-    def save_gps_data():
-        gps_data = app.get_data()
-        x, y = extract_from_gps(gps_data)
-        logger.info(f"Location : {x},{y}")
-    app = GPS()
-    app.start()
-    schedule.every(5).seconds.do(save_gps_data)
