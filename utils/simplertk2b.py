@@ -1,9 +1,11 @@
 import threading
 import time
 
-import serial
+# import serial
+import schedule
 import pynmea2
 
+from utils.commons import extract_from_gps
 from utils.logger import logger
 
 
@@ -33,7 +35,6 @@ class GPS(threading.Thread):
         buffer = self._ser.in_waiting
         if buffer < 80:
             time.sleep(.2)
-        data = {}
         line = self._ser.readline().decode('utf-8', errors='ignore').strip()
         if line.startswith('$GNGGA'):
             try:
@@ -75,3 +76,15 @@ class GPS(threading.Thread):
     def get_data(self):
         """Returns the latest parsed data."""
         return self._data
+
+
+def save_gps_data(self):
+    gps_data = self.gps.get_data()
+    x, y = extract_from_gps(gps_data)
+    logger.info(f"Location : {x},{y}")
+
+
+if __name__ == "__main__":
+    app = GPS()
+    app.start()
+    schedule.every(5).seconds.do(save_gps_data)
