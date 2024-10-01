@@ -42,7 +42,7 @@ class GPS(threading.Thread):
                     label, attr = field[:2]
                     value = getattr(msg, attr)
                     self._data[attr] = value
-                logger.debug(self._data)
+                # logger.debug(self._data)
             except pynmea2.ParseError as e:
                 logger.error(f"Parse error: {e}")
 
@@ -63,6 +63,7 @@ class GPS(threading.Thread):
 
     def stop(self):
         self._b_stop.set()
+        self.join()
         self._close_serial()
 
     def _close_serial(self):

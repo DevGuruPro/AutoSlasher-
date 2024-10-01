@@ -76,10 +76,10 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording obstacle...')
         self.gps.start()
 
-        schedule.every(5).seconds.do(lambda: self.save_gps_data(self.obs_index))
+        schedule.every(3).seconds.do(lambda: self.save_gps_data(self.obs_index))
         while not self._gps_stop:
             schedule.run_pending()
-            time.sleep(2)
+            time.sleep(1)
         self.obs_index = self.obs_index+1
 
     def stop_recording(self):
@@ -88,7 +88,6 @@ class AutoSlasher(QMainWindow):
             self._gps_stop = True
             if self.gps.is_alive():
                 self.gps.stop()
-                self.gps.join()
             self.save_file()
 
     def save_gps_data(self, index):
