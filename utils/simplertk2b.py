@@ -5,8 +5,8 @@ import serial
 import schedule
 import pynmea2
 
-from utils.commons import extract_from_gps
-from utils.logger import logger
+from commons import extract_from_gps
+from logger import logger
 
 
 class GPS(threading.Thread):
