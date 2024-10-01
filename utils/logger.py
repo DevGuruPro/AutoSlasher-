@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from settings import ROOT_DIR
 
 
-LOG_FILE = os.path.join(ROOT_DIR, "eol.log")
+LOG_FILE = os.path.join(ROOT_DIR, "as.log")
 
 
 class CustomFormatter(logging.Formatter):
@@ -34,7 +34,7 @@ class CustomFormatter(logging.Formatter):
         return _formatter.format(record)
 
 
-logger = logging.getLogger("EL")
+logger = logging.getLogger("AS")
 logger.setLevel(logging.DEBUG)  # better to have too much log than not enough
 logger.handlers = []
 formatter = CustomFormatter()
