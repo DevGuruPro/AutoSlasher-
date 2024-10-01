@@ -3,7 +3,7 @@ numpy
 matplotlib
 networkx
 shapely
-serial
+pyserial
 pynmea2
 pyproj
 schedule
