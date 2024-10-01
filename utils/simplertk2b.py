@@ -1,7 +1,7 @@
 import threading
 import time
 
-# import serial
+import serial
 import schedule
 import pynmea2
 
