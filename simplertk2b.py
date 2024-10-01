@@ -24,7 +24,7 @@ class GPS(threading.Thread):
     def _connect(self):
         """Attempts to connect to the GPS module."""
         try:
-            _ser = serial.Serial(port=self.port, baudrate=self.baud_rate, timeout=1)
+            _ser = serial.Serial(port=self.port, baudrate=self.baud_rate, timeout=1, write_timeout=1)
             logger.info("Connected to simplertk2b module.")
             return _ser
         except serial.SerialException as e:
@@ -78,13 +78,11 @@ class GPS(threading.Thread):
         return self._data
 
 
-def save_gps_data(self):
-    gps_data = self.gps.get_data()
-    x, y = extract_from_gps(gps_data)
-    logger.info(f"Location : {x},{y}")
-
-
 if __name__ == "__main__":
+    def save_gps_data():
+        gps_data = app.get_data()
+        x, y = extract_from_gps(gps_data)
+        logger.info(f"Location : {x},{y}")
     app = GPS()
     app.start()
     schedule.every(5).seconds.do(save_gps_data)
