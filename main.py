@@ -1,5 +1,5 @@
 import sys
-# import schedule
+import schedule
 import time
 from typing import List, Tuple
 
@@ -67,10 +67,10 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording boundary...')
         self.gps.start()
 
-        schedule.every(5).seconds.do(lambda: self.save_gps_data(0))
+        schedule.every(3).seconds.do(lambda: self.save_gps_data(0))
         while not self._gps_stop:
             schedule.run_pending()
-            time.sleep(2)
+            time.sleep(1)
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
