@@ -28,6 +28,7 @@ class AutoSlasher(QMainWindow):
         self.ui.setupUi(self)
         # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
         # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        # self.showFullScreen()
 
         # self.ui.combo_field.addItem("Option 1")
         # self.ui.combo_field.addItem("Option 2")
@@ -112,5 +113,8 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = AutoSlasher()
+    screen_geometry = app.primaryScreen().geometry()
+    screen_geometry.adjust(50, 50, -50, -50)
+    window.setGeometry(screen_geometry)
     window.show()
     sys.exit(app.exec())
