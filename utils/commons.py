@@ -1,5 +1,5 @@
 from pyproj import Transformer
-from utils.logger import logger
+from logger import logger
 
 # gps_data = {
 #     'timestamp': datetime.time(12, 14, 15, 600000, tzinfo=datetime.timezone.utc),
