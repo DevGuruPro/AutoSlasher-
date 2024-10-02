@@ -3,13 +3,14 @@ import time
 
 import serial
 import pynmea2
-from PySide6.QtCore import Signal
+
+from PySide6.QtCore import Signal, QThread
 
 from settings import GPS_STAT_MSG
 from utils.logger import logger
 
 
-class GPS(threading.Thread):
+class GPS(QThread):
 
     sig_msg = Signal(str)
 
@@ -49,7 +50,7 @@ class GPS(threading.Thread):
                 self.sig_msg.emit(GPS_STAT_MSG[0])
             except pynmea2.ParseError as e:
                 logger.error(f"Parse error: {e}")
-                self.sig_msg.emit(GPS_STAT_MSG[1])
+                self.sig_msg.emit(GPS_STAT_MSG[2])
 
     def run(self):
         """Main loop for reading from GPS module."""

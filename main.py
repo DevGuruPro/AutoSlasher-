@@ -50,6 +50,7 @@ class AutoSlasher(QMainWindow):
         self.ui.generateF.clicked.connect(self.save_file)
 
         self.gps = GPS(port=serial_port, baud_rate=baud_rate)
+        self.gps.sig_msg.connect(self.show_gps_status)
         self.scheduler_thread = threading.Thread(target=self.start_scheduler)
         self._gps_stop = threading.Event()
         self.obs_index = 1
