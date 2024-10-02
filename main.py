@@ -83,6 +83,7 @@ class AutoSlasher(QMainWindow):
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
+        self.field_data.append([])
         self.gps = GPS(port=serial_port, baud_rate=baud_rate)
         self.gps.start()
         self._gps_stop = threading.Event()
