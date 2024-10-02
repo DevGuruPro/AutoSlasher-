@@ -78,10 +78,10 @@ class AutoSlasher(QMainWindow):
 
     def start_scheduler(self, index):
         schedule.clear()
-        schedule.every(3).seconds.do(lambda: self.save_gps_data(index))
+        schedule.every(1).seconds.do(lambda: self.save_gps_data(index))
         while not self._gps_stop.is_set():
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(0.1)
 
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
