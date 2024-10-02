@@ -67,6 +67,7 @@ class AutoSlasher(QMainWindow):
         self.ui.combo_field.blockSignals(False)
 
     def start_scheduler(self, index):
+        schedule.clear()
         schedule.every(3).seconds.do(lambda: self.save_gps_data(index))
         while not self._gps_stop.is_set():
             schedule.run_pending()
@@ -75,18 +76,16 @@ class AutoSlasher(QMainWindow):
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
         self.field_data[0].clear()
-        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
         self.gps.start()
-        self._gps_stop = threading.Event()
+        self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
         self.scheduler_thread.start()
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
         self.field_data.append([])
-        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
         self.gps.start()
-        self._gps_stop = threading.Event()
+        self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(self.obs_index,))
         self.scheduler_thread.start()
         self.obs_index = self.obs_index+1

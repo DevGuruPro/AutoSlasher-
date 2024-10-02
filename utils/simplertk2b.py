@@ -16,8 +16,6 @@ class GPS(threading.Thread):
         self._ser = None
         self._b_stop = threading.Event()
         self._data = {}
-        self._cor_data = None
-        self.fixed_state = False
 
     def _connect(self):
         """Attempts to connect to the GPS module."""
@@ -46,6 +44,9 @@ class GPS(threading.Thread):
                 logger.error(f"Parse error: {e}")
 
     def run(self):
+        self._ser = None
+        self._b_stop.clear()
+        self._data.clear()
         """Main loop for reading from GPS module."""
         self._ser = self._connect()
         while self._ser is None:
