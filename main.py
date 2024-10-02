@@ -95,7 +95,6 @@ class AutoSlasher(QMainWindow):
             logger.info('Schedule stopped')
             if self.gps.is_alive():
                 self.gps.stop()
-            self.save_file()
 
     def save_gps_data(self, index):
         gps_data = self.gps.get_data()
