@@ -2,7 +2,6 @@ import threading
 import time
 
 import serial
-import schedule
 import pynmea2
 
 from utils.logger import logger

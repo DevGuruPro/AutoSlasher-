@@ -83,6 +83,7 @@ class AutoSlasher(QMainWindow):
         self.obs_index = self.obs_index+1
 
     def stop_recording(self):
+        logger.info("Stop Button clincked")
         if not self._gps_stop:
             logger.info('Stopping recording...')
             self._gps_stop = True
@@ -106,6 +107,10 @@ class AutoSlasher(QMainWindow):
                 file.write('###')
                 for j in range(len(self.field_data[i])):
                     file.write(f"{self.field_data[i][j]}\n")
+
+    def closeEvent(self, event):
+        self.gps.stop()
+        return super().closeEvent(event)
 
 
 if __name__ == "__main__":
