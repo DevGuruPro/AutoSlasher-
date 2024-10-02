@@ -855,6 +855,15 @@ class Ui_AS(object):
 
         self.horizontalLayout_6.addWidget(self.label_3)
 
+        self.gps_sts = QLabel(self.naviWidget)
+        self.gps_sts.setObjectName(u"gps_sts")
+        self.gps_sts.setFont(font3)
+        self.gps_sts.setStyleSheet(u"QLabel{\n"
+"	color: black;\n"
+"}")
+
+        self.horizontalLayout_6.addWidget(self.gps_sts)
+
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_6.addItem(self.horizontalSpacer_2)
@@ -1530,6 +1539,7 @@ class Ui_AS(object):
         self.deleteF.setText(QCoreApplication.translate("AS", u"Discard", None))
         self.label_3.setText(QCoreApplication.translate("AS", u"Auto Mode - RTK GPS Guidance\n"
 "Field : Front Yard1", None))
+        self.gps_sts.setText(QCoreApplication.translate("AS", u"GPS Good", None))
         self.startGuid.setText(QCoreApplication.translate("AS", u"Start", None))
         self.stopGuid.setText(QCoreApplication.translate("AS", u"Stop", None))
         self.addObst.setText(QCoreApplication.translate("AS", u"Add Obstacle", None))

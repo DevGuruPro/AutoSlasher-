@@ -25,6 +25,11 @@ Error_MSG = {
     "AutoSlasher is of bounds, manually drive out of the exclusion zone to start the field."
 }
 
+GPS_STAT_MSG = {
+    "GPS Good",
+    "GPS Bad"
+}
+
 try:
     from local_settings import *
 except ImportError:

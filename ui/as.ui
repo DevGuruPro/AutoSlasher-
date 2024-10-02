@@ -2790,6 +2790,26 @@ Field : Front Yard1</string>
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="gps_sts">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel{
+	color: black;
+}</string>
+            </property>
+            <property name="text">
+             <string>GPS Good</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

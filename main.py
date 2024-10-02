@@ -77,6 +77,7 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording boundary...')
         self.field_data[0].clear()
         self.gps = GPS(port=serial_port, baud_rate=baud_rate)
+        self.gps.sig_msg.connect(self.show_gps_status)
         self.gps.start()
         self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
@@ -86,6 +87,7 @@ class AutoSlasher(QMainWindow):
         logger.info('Starting recording obstacle...')
         self.field_data.append([])
         self.gps = GPS(port=serial_port, baud_rate=baud_rate)
+        self.gps.sig_msg.connect(self.show_gps_status)
         self.gps.start()
         self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(self.obs_index,))
@@ -117,6 +119,9 @@ class AutoSlasher(QMainWindow):
                 file.write('###')
                 for j in range(len(self.field_data[i])):
                     file.write(f"{self.field_data[i][j]}\n")
+
+    def show_gps_status(self, status):
+        self.ui.gps_sts.setText(status)
 
     def closeEvent(self, event):
         self.gps.stop()
