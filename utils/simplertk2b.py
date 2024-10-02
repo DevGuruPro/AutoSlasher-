@@ -69,7 +69,7 @@ class GPS(QThread):
 
     def stop(self):
         self._b_stop.set()
-        self.join()
+        self.wait()
         self._close_serial()
 
     def _close_serial(self):

@@ -72,7 +72,6 @@ class AutoSlasher(QMainWindow):
         self._gps_stop.clear()
 
     def handle_activated(self, index):
-        print(index)
         self.ui.combo_field.blockSignals(True)
         self.ui.combo_field.setCurrentText(f"Selected Field: {self.ui.combo_field.itemText(index)}")
         self.ui.combo_field.blockSignals(False)
@@ -108,6 +107,7 @@ class AutoSlasher(QMainWindow):
 
     def save_gps_data(self, index):
         gps_data = self.gps.get_data()
+        logger.debug(gps_data)
         try:
             x, y = extract_from_gps(gps_data)
             logger.info(f"Location : {x},{y}")
@@ -132,7 +132,7 @@ class AutoSlasher(QMainWindow):
     def closeEvent(self, event):
         self.gps.stop()
         self._gps_stop.set()
-        self.scheduler_thread.join()
+        self.scheduler_thread.join(.1)
         schedule.clear()
         return super().closeEvent(event)
 
