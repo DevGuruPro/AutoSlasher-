@@ -107,14 +107,17 @@ class AutoSlasher(QMainWindow):
             self._gps_stop.set()
             self.scheduler_thread.join()
             logger.info('Schedule stopped')
-            if self.gps.is_alive():
+            if self.gps.isRunning():
                 self.gps.stop()
 
     def save_gps_data(self, index):
         gps_data = self.gps.get_data()
-        x, y = extract_from_gps(gps_data)
-        logger.info(f"Location : {x},{y}")
-        self.field_data[index].append((int(x), int(y)))
+        try:
+            x, y = extract_from_gps(gps_data)
+            logger.info(f"Location : {x},{y}")
+            self.field_data[index].append((int(x), int(y)))
+        except KeyError:
+            logger.error('Can not extract Location')
 
     def save_file(self):
         name_dlg = NameDlg(self)
