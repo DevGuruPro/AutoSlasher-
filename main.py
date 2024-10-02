@@ -1,4 +1,6 @@
 import sys
+import threading
+
 import schedule
 import time
 from typing import List, Tuple
@@ -53,7 +55,8 @@ class AutoSlasher(QMainWindow):
         self.ui.generateF.clicked.connect(self.save_file)
 
         self.gps = GPS(port=serial_port, baud_rate=baud_rate)
-        self._gps_stop = False
+        self.scheduler_thread = threading.Thread(target=self.start_scheduler)
+        self._gps_stop = threading.Event()
         self.obs_index = 1
         self.field_data: List[List[Tuple[int, int]]] = [[]]
 
@@ -63,27 +66,29 @@ class AutoSlasher(QMainWindow):
         self.ui.combo_field.setCurrentText(f"Selected Field: {self.ui.combo_field.itemText(index)}")
         self.ui.combo_field.blockSignals(False)
 
+    def start_scheduler(self, index):
+        schedule.every(3).seconds.do(lambda: self.save_gps_data(index))
+        while not self._gps_stop.is_set():
+            schedule.run_pending()
+            time.sleep(1)
+
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
         self.gps.start()
-
-        schedule.every(3).seconds.do(lambda: self.save_gps_data(0))
-        while not self._gps_stop:
-            schedule.run_pending()
-            time.sleep(1)
+        self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
+        self.scheduler_thread.start()
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
         self.gps.start()
-
-        schedule.every(3).seconds.do(lambda: self.save_gps_data(self.obs_index))
-        while not self._gps_stop:
-            schedule.run_pending()
-            time.sleep(1)
+        self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(self.obs_index,))
+        self.scheduler_thread.start()
         self.obs_index = self.obs_index+1
 
     def stop_recording(self):
-        logger.info("Stop Button clincked")
+        logger.info("Stop Button clicked")
+        self._gps_stop.set()
+        self.scheduler_thread.join()
         if not self._gps_stop:
             logger.info('Stopping recording...')
             self._gps_stop = True
