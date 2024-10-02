@@ -26,8 +26,8 @@ Error_MSG = {
 }
 
 GPS_STAT_MSG = {
-    "GPS Good",
-    "GPS Bad"
+    "GPS Quality: Good",
+    "GPS Quality: Bad"
 }
 
 try:

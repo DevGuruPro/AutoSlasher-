@@ -15,6 +15,8 @@ class DisplayBoard(QWidget):
         margin = 50
         self.outline_rect = self.geometry().adjusted(margin, margin, -margin, -margin)
         self.bounding_rect = self.geometry().adjusted(margin, margin, -margin, -margin)
+        self.grid_size = 20
+        self.update()
 
     def add_point(self, x, y):
         new_point = QPoint(self.outline_rect.center().x()+x, self.outline_rect.center().y()+y)
@@ -41,14 +43,27 @@ class DisplayBoard(QWidget):
         self.scale = min(scale_x, scale_y)
 
     def paintEvent(self, event):
-        if not self.points:
-            return
 
         painter = QPainter(self)
         pen = QPen(QColor(0, 0, 0))
         pen.setWidth(2)
         painter.setPen(pen)
-        painter.drawRect(self.outline_rect)
+        # painter.drawRect(self.outline_rect)
+
+        rect = self.rect()
+        print(rect)
+        x = rect.left()
+        while x <= rect.right():
+            painter.drawLine(x, rect.top(), x, rect.bottom())
+            x += self.grid_size
+
+        y = rect.top()
+        while y <= rect.bottom():
+            painter.drawLine(rect.left(), y, rect.right(), y)
+            y += self.grid_size
+
+        if not self.points:
+            return
 
         painter.scale(self.scale, self.scale)
 
@@ -89,6 +104,6 @@ class DisplayBoard(QWidget):
 #
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)
-#     main_window = MainWindow()
+#     main_window = DisplayBoard()
 #     main_window.show()
 #     sys.exit(app.exec())

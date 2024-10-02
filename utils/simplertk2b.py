@@ -25,9 +25,11 @@ class GPS(threading.Thread):
         """Attempts to connect to the GPS module."""
         try:
             _ser = serial.Serial(port=self.port, baudrate=self.baud_rate, timeout=1, write_timeout=1)
+            self.sig_msg.emit(GPS_STAT_MSG[0])
             logger.info("Connected to simplertk2b module.")
             return _ser
         except serial.SerialException as e:
+            self.sig_msg.emit(GPS_STAT_MSG[1])
             logger.error(f"Failed to connect to simplertk2b module: {e}")
             return None
 
@@ -47,7 +49,7 @@ class GPS(threading.Thread):
                 self.sig_msg.emit(GPS_STAT_MSG[0])
             except pynmea2.ParseError as e:
                 logger.error(f"Parse error: {e}")
-                self.sig_msg.emit(GPS_STAT_MSG[0])
+                self.sig_msg.emit(GPS_STAT_MSG[1])
 
     def run(self):
         """Main loop for reading from GPS module."""
