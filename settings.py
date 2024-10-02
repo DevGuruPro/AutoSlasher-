@@ -20,16 +20,16 @@ if not os.path.exists(CONFIG_FILE):
 serial_port = '/dev/ttyAMA0'
 baud_rate = 115200
 
-Error_MSG = {
+Error_MSG = [
     "AutoSlasher is of bounds, manually drive to within the Field Boundary to start the field.",
     "AutoSlasher is of bounds, manually drive out of the exclusion zone to start the field."
-}
+]
 
-GPS_STAT_MSG = {
+GPS_STAT_MSG = [
     "GPS Quality: Excellent",
     "GPS Quality: Poor",
     "GPS Quality: Fault"
-}
+]
 
 try:
     from local_settings import *

@@ -15,7 +15,7 @@ class GPS(QThread):
     sig_msg = Signal(str)
 
     def __init__(self, port='/dev/ttyAMA0', baud_rate=115200):
-        super().__init__(daemon=True)
+        super().__init__()
         self.port = port
         self.baud_rate = baud_rate
         self._ser = None
