@@ -74,6 +74,7 @@ class AutoSlasher(QMainWindow):
 
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
+        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
         self.gps.start()
         self._gps_stop = threading.Event()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
@@ -81,6 +82,7 @@ class AutoSlasher(QMainWindow):
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
+        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
         self.gps.start()
         self._gps_stop = threading.Event()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(self.obs_index,))
