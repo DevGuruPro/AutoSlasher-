@@ -120,6 +120,9 @@ class AutoSlasher(QMainWindow):
 
     def closeEvent(self, event):
         self.gps.stop()
+        self._gps_stop.set()
+        self.scheduler_thread.join()
+        schedule.clear()
         return super().closeEvent(event)
 
 
