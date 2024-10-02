@@ -107,13 +107,12 @@ class AutoSlasher(QMainWindow):
 
     def save_gps_data(self, index):
         gps_data = self.gps.get_data()
-        logger.debug(gps_data)
-        try:
-            x, y = extract_from_gps(gps_data)
-            logger.info(f"Location : {x},{y}")
+        x, y = extract_from_gps(gps_data)
+        if x is not None and y is not None:
+            logger.info(f"Converted coordinates: X={x}, Y={y}")
             self.field_data[index].append((int(x), int(y)))
-        except KeyError:
-            logger.error('Can not extract Location')
+        else:
+            logger.error("Conversion failed.")
 
     def save_file(self):
         name_dlg = NameDlg(self)
