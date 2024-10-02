@@ -75,23 +75,24 @@ class AutoSlasher(QMainWindow):
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
         self.gps.start()
+        self._gps_stop = threading.Event()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
         self.scheduler_thread.start()
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
         self.gps.start()
+        self._gps_stop = threading.Event()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(self.obs_index,))
         self.scheduler_thread.start()
         self.obs_index = self.obs_index+1
 
     def stop_recording(self):
-        logger.info("Stop Button clicked")
-        self._gps_stop.set()
-        self.scheduler_thread.join()
-        if not self._gps_stop:
+        if not self._gps_stop.is_set():
             logger.info('Stopping recording...')
-            self._gps_stop = True
+            self._gps_stop.set()
+            self.scheduler_thread.join()
+            logger.info('Schedule stopped')
             if self.gps.is_alive():
                 self.gps.stop()
             self.save_file()
