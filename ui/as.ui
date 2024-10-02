@@ -1553,7 +1553,7 @@ QPushButton:pressed {
            <number>10</number>
           </property>
           <item>
-           <widget class="QWidget" name="widget_16" native="true">
+           <widget class="QWidget" name="sureWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -2095,6 +2095,26 @@ QPushButton:pressed {
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="gps_sts">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel{
+	color: black;
+}</string>
+            </property>
+            <property name="text">
+             <string>GPS Quality:</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -2786,26 +2806,6 @@ QPushButton:pressed {
             <property name="text">
              <string>Auto Mode - RTK GPS Guidance
 Field : Front Yard1</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="gps_sts">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{
-	color: black;
-}</string>
-            </property>
-            <property name="text">
-             <string>GPS Quality:</string>
             </property>
            </widget>
           </item>

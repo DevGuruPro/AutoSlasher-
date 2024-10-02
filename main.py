@@ -41,11 +41,6 @@ class AutoSlasher(QMainWindow):
         # LoadingDlg(self).show()
         # RecordingPopup(self).show()
 
-        self.ui.startPage.hide()
-        self.ui.settingPage.hide()
-        self.ui.fmanagerPage.hide()
-        # self.ui.fieldPage.hide()
-        self.ui.movingPage.hide()
         # self.ui.centralwidget.setStyleSheet("background-image: url(path_to_your_image.jpg);")
 
         self.ui.startBoun.clicked.connect(self.start_recording_boundary)
@@ -59,6 +54,17 @@ class AutoSlasher(QMainWindow):
         self._gps_stop = threading.Event()
         self.obs_index = 1
         self.field_data: List[List[Tuple[int, int]]] = [[]]
+        self.to_record_field_page()
+
+    def to_record_field_page(self):
+        self.ui.startPage.hide()
+        self.ui.settingPage.hide()
+        self.ui.fmanagerPage.hide()
+        self.ui.fieldPage.show()
+        self.ui.movingPage.hide()
+
+        self.ui.naviWidget.hide()
+        self.ui.sureWidget.hide()
 
     def handle_activated(self, index):
         print(index)
