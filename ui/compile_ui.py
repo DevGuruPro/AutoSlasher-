@@ -35,4 +35,5 @@ if __name__ == '__main__':
                     lines = sources.readlines()
                 with open(rc, "w") as sources:
                     for line in lines:
-                        sources.write(line.replace(f"import {RC_NAME}_rc", f"import ui.{RC_NAME}_rc"))
+                        line = line.replace(f"import {RC_NAME}_rc", f"import ui.{RC_NAME}_rc")
+                        sources.write(line.replace(f"from displayboard import DisplayBoard", f"from widget.displayBoard import DisplayBoard"))

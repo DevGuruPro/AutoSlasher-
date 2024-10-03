@@ -22,4 +22,3 @@ class NameDlg(QDialog):
 
     def get_name(self):
         return self.ui.lineEdit.text()
-
