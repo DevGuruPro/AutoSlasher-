@@ -7,3 +7,4 @@ pyserial
 pynmea2
 pyproj
 schedule
+smbus2
