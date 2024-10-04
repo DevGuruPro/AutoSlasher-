@@ -198,3 +198,12 @@ def calculate_heading(x, y):
     if heading_degrees >= 360:
         heading_degrees -= 360
     return heading_degrees
+
+
+def calculate_path_heading(point1, point2):
+    # Calculate the direction from point1 to point2
+    dy = point2[1] - point1[1]
+    dx = point2[0] - point1[0]
+    # atan2 returns the angle in radians; convert it to degrees
+    angle = math.atan2(dy, dx) * (180 / math.pi)
+    return angle % 360
