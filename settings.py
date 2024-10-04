@@ -31,6 +31,17 @@ GPS_STAT_MSG = [
     "GPS Quality: Fault"
 ]
 
+CALIBRATION = {
+    "MIN_X": 962,
+    "MAX_X": 2553,
+    "MIN_Y": -1555,
+    "MAX_Y": 27,
+    "MIN_Z": -1015,
+    "MAX_Z": 642
+}
+
+MAGNETIC_DECLINATION = 0.0
+
 try:
     from local_settings import *
 except ImportError:
