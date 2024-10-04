@@ -1,16 +1,13 @@
-# widget/compass.py
-
 import sys
 import time
+import os
+
 from PySide6.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QPainter, QPixmap, QPen
+from PySide6.QtGui import QPainter, QPixmap, QPen, QColor
 
-# Add the directory containing magnetometer.py to sys.path
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../imu'))
+from utils.magnetometer import MagnetometerSensor
 
-from magnetometer import MagnetometerSensor  # Import the MagnetometerSensor class
 
 class CompassWidget(QWidget):
     def __init__(self):
@@ -19,7 +16,7 @@ class CompassWidget(QWidget):
         self.setGeometry(100, 100, 400, 400)
         self.layout = QVBoxLayout(self)
         self.angle_label = QLabel("Heading: 0°", self)
-        self.angle_label.setAlignment(Qt.AlignCenter)
+        self.angle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.angle_label.setStyleSheet("font-size: 20px;")
         self.layout.addStretch()
         self.layout.addWidget(self.angle_label)
@@ -34,7 +31,7 @@ class CompassWidget(QWidget):
         else:
             print(f"Error: Arrow image not found at {arrow_image_path}")
             self.arrow_image = QPixmap(100, 100)  # Create a placeholder pixmap
-            self.arrow_image.fill(Qt.transparent)  # Fill it with transparency
+            self.arrow_image.fill(QColor(0, 0, 0, 0))  # Fill it with transparency
 
         self.sensor = MagnetometerSensor()  # Initialize the MagnetometerSensor
 
@@ -47,7 +44,7 @@ class CompassWidget(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         center = self.rect().center()
         painter.translate(center)
         painter.save()
@@ -55,7 +52,7 @@ class CompassWidget(QWidget):
         painter.drawPixmap(-self.arrow_image.width() // 2, -self.arrow_image.height() // 2, self.arrow_image)
         painter.restore()
         if self.target_heading is not None:
-            painter.setPen(QPen(Qt.red, 2, Qt.SolidLine))
+            painter.setPen(QPen(QColor('red'), 2, Qt.PenStyle.SolidLine))
             painter.save()
             painter.rotate(self.target_heading)
             painter.drawLine(0, 0, 0, 100)
@@ -65,6 +62,7 @@ class CompassWidget(QWidget):
         if self.sensor:
             del self.sensor
         event.accept()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

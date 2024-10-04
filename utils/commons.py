@@ -1,8 +1,10 @@
+import math
 from pyproj import Transformer
 import numpy as np
 from shapely.geometry import Polygon, LineString, MultiPolygon
 import networkx as nx
 
+from settings import CALIBRATION, MAGNETIC_DECLINATION
 from utils.logger import logger
 
 
@@ -168,3 +170,31 @@ def generate_path(field_data):
     else:
         logger.error("Failed to create a valid smaller boundary.")
         return None
+
+
+def apply_calibration(x, y, z):
+    # Apply calibration to raw data
+    x_calibrated = _normalize(x, CALIBRATION['MIN_X'], CALIBRATION['MAX_X'])
+    y_calibrated = _normalize(y, CALIBRATION['MIN_Y'], CALIBRATION['MAX_Y'])
+    z_calibrated = _normalize(z, CALIBRATION['MIN_Z'], CALIBRATION['MAX_Z'])
+    return x_calibrated, y_calibrated, z_calibrated
+
+
+def _normalize(value, min_val, max_val):
+    return (2 * (value - min_val) / (max_val - min_val)) - 1
+
+
+def calculate_heading(x, y):
+    # Calculate the heading in radians
+    heading_radians = math.atan2(y, x)
+    # Convert the heading to degrees
+    heading_degrees = math.degrees(heading_radians)
+    # Normalize the heading to be in the range of 0 to 360 degrees
+    if heading_degrees < 0:
+        heading_degrees += 360
+    # Apply magnetic declination
+    heading_degrees += MAGNETIC_DECLINATION
+    # Normalize again to ensure it's within 0-360 degrees
+    if heading_degrees >= 360:
+        heading_degrees -= 360
+    return heading_degrees
