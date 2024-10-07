@@ -8,3 +8,4 @@ pynmea2
 pyproj
 schedule
 smbus2
+RPi.GPIO

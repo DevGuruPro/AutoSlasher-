@@ -200,10 +200,23 @@ def calculate_heading(x, y):
     return heading_degrees
 
 
-def calculate_path_heading(point1, point2):
+def calculate_heading_to_waypoint(point1, point2):
     # Calculate the direction from point1 to point2
     dy = point2[1] - point1[1]
     dx = point2[0] - point1[0]
     # atan2 returns the angle in radians; convert it to degrees
     angle = math.atan2(dy, dx) * (180 / math.pi)
     return angle % 360
+
+
+def distance_to_waypoint(current_position, waypoint):
+    return math.sqrt(
+        (waypoint[0] - current_position[0]) ** 2 +
+        (waypoint[1] - current_position[1]) ** 2
+    )
+
+
+def clip_speed(value):
+    """ Clip the speed within the boundaries of -MAX_SPEED to MAX_SPEED. """
+    return max(min(value, 1.0), -1.0)
+

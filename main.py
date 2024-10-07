@@ -5,17 +5,17 @@ import schedule
 import time
 from typing import List, Tuple
 
-from PySide6 import QtCore
-from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
 
-from settings import serial_port, baud_rate
+from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE
 from ui.ui_as import Ui_AS
 
-from utils.commons import extract_from_gps, generate_path
+from utils.commons import (extract_from_gps, generate_path, calculate_heading_to_waypoint,
+                           distance_to_waypoint, clip_speed)
+# from utils.magnetometer import Magnetometer
+# from utils.robot import Robot
 from utils.simplertk2b import GPS
 from utils.logger import logger
-from widget.displayBoard import DisplayBoard
 
 from widget.loadingDlg import LoadingDlg
 from widget.nameDlg import NameDlg
@@ -52,16 +52,22 @@ class AutoSlasher(QMainWindow):
         self.ui.stopObs.clicked.connect(self.stop_recording)
         self.ui.generateF.clicked.connect(self.save_file)
 
-        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
-        self.scheduler_thread = threading.Thread(target=self.start_scheduler)
-        self._gps_stop = threading.Event()
-        self.field_data: List[List[Tuple[int, int]]] = [[]]
-
-        self.path_thread = threading.Thread(target=self.set_generated_path)
-
         self.ui.settingPage.hide()
         self.ui.fmanagerPage.hide()
         self.ui.fieldPage.hide()
+
+        self.field_data: List[List[Tuple[float, float]]] = [[]]
+        self.waypoint = []
+        self._moving_stop = False
+        # self.focal = None
+
+        self.gps = GPS()
+        self.scheduler_thread = threading.Thread(target=self.start_scheduler)
+        self._gps_stop = threading.Event()
+        self.path_thread = threading.Thread(target=self.set_generated_path)
+
+        # self.compass = Magnetometer()
+        # self.robot = Robot()
 
     def to_record_field_page(self):
         self.ui.fmanagerPage.hide()
@@ -71,7 +77,7 @@ class AutoSlasher(QMainWindow):
         self.ui.naviWidget.hide()
         self.ui.sureWidget.hide()
 
-        self.gps = GPS(port=serial_port, baud_rate=baud_rate)
+        self.gps = GPS(port=SERIAL_PORT, baud_rate=BAUD_RATE)
         self.gps.sig_msg.connect(self.show_gps_status)
         self.gps.start()
         self._gps_stop.clear()
@@ -102,6 +108,42 @@ class AutoSlasher(QMainWindow):
             schedule.run_pending()
             time.sleep(0.1)
 
+    def get_position(self):
+        gps_data = self.gps.get_data()
+        return extract_from_gps(gps_data)
+
+    # def follow_path(self):
+    #     for i in range(1, len(self.waypoint)):
+    #         self.navigate_to_waypoint(self.waypoint[i])
+    #
+    # def navigate_to_waypoint(self, waypoint):
+    #     while True:
+    #         current_position = self.get_position()
+    #         distance = distance_to_waypoint(current_position, waypoint)
+    #         if distance < POSITION_TOLERANCE:
+    #             logger.debug(f'Reached waypoint : {waypoint}')
+    #             return
+    #         target_heading = calculate_heading_to_waypoint(current_position, waypoint)
+    #         heading_error = (target_heading - self.compass.read_heading() + 360) % 360
+    #         if heading_error > 180:
+    #             heading_error -= 360
+    #
+    #         k_p_heading = 0.1  # Proportional gain for heading
+    #         k_p_position = 0.01
+    #
+    #         heading_correction = k_p_heading * heading_error
+    #         speed_correction = k_p_position * distance
+    #         base_speed = 0.5
+    #
+    #         left_speed = base_speed - heading_correction + speed_correction
+    #         right_speed = base_speed + heading_correction + speed_correction
+    #
+    #         # Adjust motor speed based on the position and heading corrections
+    #         self.robot.set_motors(left_speed=clip_speed(left_speed),
+    #                               right_speed=clip_speed(right_speed))
+    #
+    #         time.sleep(0.1)
+
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
         self.field_data[0].clear()
@@ -126,11 +168,10 @@ class AutoSlasher(QMainWindow):
                 self.gps.stop()
 
     def save_gps_data(self, index):
-        gps_data = self.gps.get_data()
-        x, y = extract_from_gps(gps_data)
+        x, y = self.get_position()
         if x is not None and y is not None:
             logger.info(f"Extracted coordinates: X = {x}, Y = {y}")
-            self.field_data[index].append((int(x), int(y)))
+            self.field_data[index].append((x, y))
             if index == 0:
                 self.ui.displayWidget.add_bnd_point(int(x), int(y))
             else:
@@ -140,33 +181,47 @@ class AutoSlasher(QMainWindow):
 
     def load_file(self, filename):
         self.field_data.clear()
+        self.waypoint.clear()
         logger.info(f'Loading {filename}...')
         with open(filename, 'r') as file:
-            current_list: List[Tuple[int, int]] = []
+            current_list: List[Tuple[float, float]] = []
+            is_path = False
             for line in file:
                 line = line.strip()
-                if line == '###':
+                if line == '###' or line == 'PATH':
                     if current_list:
                         self.field_data.append(current_list)
                     current_list = []
+                    if line == 'PATH':
+                        is_path = True
                 else:
                     line = line.strip('()')
                     parts = line.split(',')
                     if len(parts) == 2:
-                        a, b = int(parts[0]), int(parts[1])
-                        tuple_data: Tuple[int, int] = (a, b)
+                        a, b = float(parts[0]), float(parts[1])
+                        tuple_data: Tuple[float, float] = (a, b)
                         current_list.append(tuple_data)
             if current_list:
-                self.field_data.append(current_list)
-        self.path_thread = threading.Thread(target=self.set_generated_path, daemon=True)
-        self.path_thread.start()
-        self.ui.guidWidget.setDisabled(True)
-        self.loadingDlg.setModal(True)
-        self.loadingDlg.exec()
+                if not is_path:
+                    self.field_data.append(current_list)
+                else:
+                    self.waypoint = current_list
+        if len(self.waypoint) == 0:
+            self.path_thread = threading.Thread(target=self.set_generated_path, args=(filename,), daemon=True)
+            self.path_thread.start()
+            self.ui.guidWidget.setDisabled(True)
+            self.loadingDlg.setModal(True)
+            self.loadingDlg.exec()
+        else:
+            self.ui.displayWidget.load_field_data(self.field_data, self.waypoint)
 
-    def set_generated_path(self):
-        path = generate_path(self.field_data)
-        self.ui.displayWidget.load_field_data(self.field_data, path)
+    def set_generated_path(self, filename):
+        self.waypoint = generate_path(self.field_data)
+        with open(filename, 'a') as file:
+            file.write('PATH\n')
+            for i in range(len(self.waypoint)):
+                file.write(f"{self.waypoint[i]}\n")
+        self.ui.displayWidget.load_field_data(self.field_data, self.waypoint)
         self.loadingDlg.close()
         self.ui.guidWidget.setEnabled(True)
 
@@ -190,7 +245,10 @@ class AutoSlasher(QMainWindow):
         if self.scheduler_thread.is_alive():
             self.scheduler_thread.join(.1)
         schedule.clear()
-        self.path_thread.join(.1)
+        if self.path_thread.is_alive():
+            self.path_thread.join(.1)
+        # if self.compass:
+        #     del self.compass
         return super().closeEvent(event)
 
 
