@@ -57,6 +57,7 @@ class AutoSlasher(QMainWindow):
         self.ui.startBtn.clicked.connect(self.on_start_button)
         self.ui.sureYes.clicked.connect(self.on_sure_yes)
         self.ui.sureNo.clicked.connect(self.on_sure_no)
+        self.ui.stopGuid.clicked.connect(self.to_start_page)
         self.ui.prevPage.clicked.connect(self.to_prev_page)
         self.ui.nextPage.clicked.connect(self.to_next_page)
 
@@ -105,6 +106,7 @@ class AutoSlasher(QMainWindow):
         self.ui.startPage.hide()
         self.ui.fieldPage.hide()
         self.ui.fmanagerPage.show()
+        self.ui.movingPage.show()
 
     def to_record_field_page(self):
         self.ui.fmanagerPage.hide()
@@ -112,12 +114,16 @@ class AutoSlasher(QMainWindow):
         self.ui.movingPage.hide()
 
         self.ui.naviWidget.hide()
+        self.ui.fieldWidget.show()
         self.ui.sureWidget.hide()
+        self.ui.recordWidget.show()
 
         self.gps = GPS(port=SERIAL_PORT, baud_rate=BAUD_RATE)
         self.gps.sig_msg.connect(self.show_gps_status)
         self.gps.start()
         self._gps_stop.clear()
+        self.field_data.clear()
+        self.waypoint.clear()
 
     def to_open_field_page(self):
         self.ui.startPage.hide()
@@ -128,6 +134,7 @@ class AutoSlasher(QMainWindow):
         self.ui.fieldPage.show()
 
         self.ui.fieldWidget.hide()
+        self.ui.naviWidget.show()
         self.ui.positionWidget.hide()
         self.ui.recordWidget.hide()
         self.ui.displayWidget.show()
