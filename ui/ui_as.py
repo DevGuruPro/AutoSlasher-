@@ -42,15 +42,15 @@ class Ui_AS(object):
 
         self.verticalLayout_11.addItem(self.verticalSpacer)
 
-        self.widget_13 = QWidget(self.startPage)
-        self.widget_13.setObjectName(u"widget_13")
-        self.horizontalLayout_9 = QHBoxLayout(self.widget_13)
+        self.startButtons = QWidget(self.startPage)
+        self.startButtons.setObjectName(u"startButtons")
+        self.horizontalLayout_9 = QHBoxLayout(self.startButtons)
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.horizontalSpacer_3 = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
 
-        self.widget_14 = QWidget(self.widget_13)
+        self.widget_14 = QWidget(self.startButtons)
         self.widget_14.setObjectName(u"widget_14")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -222,7 +222,7 @@ class Ui_AS(object):
         self.horizontalLayout_9.addItem(self.horizontalSpacer_4)
 
 
-        self.verticalLayout_11.addWidget(self.widget_13)
+        self.verticalLayout_11.addWidget(self.startButtons)
 
         self.widget_15 = QWidget(self.startPage)
         self.widget_15.setObjectName(u"widget_15")
@@ -1410,41 +1410,41 @@ class Ui_AS(object):
         self.horizontalLayout_16.setSpacing(0)
         self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
         self.horizontalLayout_16.setContentsMargins(20, 0, 20, 0)
-        self.prevField = QToolButton(self.widget_20)
-        self.prevField.setObjectName(u"prevField")
-        sizePolicy3.setHeightForWidth(self.prevField.sizePolicy().hasHeightForWidth())
-        self.prevField.setSizePolicy(sizePolicy3)
-        self.prevField.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.prevField.setStyleSheet(u"QToolButton {\n"
+        self.prevPage = QToolButton(self.widget_20)
+        self.prevPage.setObjectName(u"prevPage")
+        sizePolicy3.setHeightForWidth(self.prevPage.sizePolicy().hasHeightForWidth())
+        self.prevPage.setSizePolicy(sizePolicy3)
+        self.prevPage.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.prevPage.setStyleSheet(u"QToolButton {\n"
 "\n"
 "    border: none; /* Remove the border */  \n"
 "}")
         icon1 = QIcon()
         icon1.addFile(u":/img/back.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.prevField.setIcon(icon1)
-        self.prevField.setIconSize(QSize(120, 40))
+        self.prevPage.setIcon(icon1)
+        self.prevPage.setIconSize(QSize(120, 40))
 
-        self.horizontalLayout_16.addWidget(self.prevField)
+        self.horizontalLayout_16.addWidget(self.prevPage)
 
         self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_16.addItem(self.horizontalSpacer_5)
 
-        self.nextField = QToolButton(self.widget_20)
-        self.nextField.setObjectName(u"nextField")
-        sizePolicy3.setHeightForWidth(self.nextField.sizePolicy().hasHeightForWidth())
-        self.nextField.setSizePolicy(sizePolicy3)
-        self.nextField.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.nextField.setStyleSheet(u"QToolButton {\n"
+        self.nextPage = QToolButton(self.widget_20)
+        self.nextPage.setObjectName(u"nextPage")
+        sizePolicy3.setHeightForWidth(self.nextPage.sizePolicy().hasHeightForWidth())
+        self.nextPage.setSizePolicy(sizePolicy3)
+        self.nextPage.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.nextPage.setStyleSheet(u"QToolButton {\n"
 "\n"
 "    border: none; /* Remove the border */  \n"
 "}")
         icon2 = QIcon()
         icon2.addFile(u":/img/next.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.nextField.setIcon(icon2)
-        self.nextField.setIconSize(QSize(120, 40))
+        self.nextPage.setIcon(icon2)
+        self.nextPage.setIconSize(QSize(120, 40))
 
-        self.horizontalLayout_16.addWidget(self.nextField)
+        self.horizontalLayout_16.addWidget(self.nextPage)
 
 
         self.verticalLayout.addWidget(self.widget_20)
@@ -1560,7 +1560,7 @@ class Ui_AS(object):
         self.label_2.setText(QCoreApplication.translate("AS", u"Record Obstacle", None))
         self.startObs.setText(QCoreApplication.translate("AS", u"Start", None))
         self.stopObs.setText(QCoreApplication.translate("AS", u"Stop", None))
-        self.prevField.setText("")
-        self.nextField.setText("")
+        self.prevPage.setText("")
+        self.nextPage.setText("")
     # retranslateUi
 

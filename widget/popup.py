@@ -14,3 +14,11 @@ class RecordingPopup(QDialog):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.ui.obs_label.hide()
+
+    def set_type(self, m_type):
+        if m_type == "boundary":
+            self.ui.bnd_label.show()
+            self.ui.obs_label.hide()
+        elif m_type == "obstacle":
+            self.ui.bnd_label.hide()
+            self.ui.obs_label.show()

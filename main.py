@@ -5,15 +5,14 @@ import schedule
 import time
 from typing import List, Tuple
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog
 
 from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE
 from ui.ui_as import Ui_AS
 
 from utils.commons import (extract_from_gps, generate_path, calculate_heading_to_waypoint,
                            distance_to_waypoint, clip_speed)
-# from utils.magnetometer import Magnetometer
-# from utils.robot import Robot
+
 from utils.simplertk2b import GPS
 from utils.logger import logger
 
@@ -40,25 +39,37 @@ class AutoSlasher(QMainWindow):
 
         self.loadingDlg = LoadingDlg(self)
         self.loadingDlg.hide()
-        # RecordingPopup(self).show()
+
+        self.recordingDlg = RecordingPopup(self)
+        self.recordingDlg.hide()
 
         # self.ui.centralwidget.setStyleSheet("background-image: url(path_to_your_image.jpg);")
-
-        self.ui.startBtn.clicked.connect(self.to_open_field_page)
 
         self.ui.startBoun.clicked.connect(self.start_recording_boundary)
         self.ui.stopBoun.clicked.connect(self.stop_recording)
         self.ui.startObs.clicked.connect(self.start_recording_obstacle)
         self.ui.stopObs.clicked.connect(self.stop_recording)
         self.ui.generateF.clicked.connect(self.save_file)
+        self.ui.deleteF.clicked.connect(self.discard_field)
+        self.ui.createFieldBtn.clicked.connect(self.to_record_field_page)
+        self.ui.m_settingBtn.clicked.connect(self.to_setting_page)
+        self.ui.f_manaBtn.clicked.connect(self.to_field_manager_page)
+        self.ui.startBtn.clicked.connect(self.on_start_button)
+        self.ui.sureYes.clicked.connect(self.on_sure_yes)
+        self.ui.sureNo.clicked.connect(self.on_sure_no)
+        self.ui.prevPage.clicked.connect(self.to_prev_page)
+        self.ui.nextPage.clicked.connect(self.to_next_page)
 
         self.ui.settingPage.hide()
         self.ui.fmanagerPage.hide()
         self.ui.fieldPage.hide()
+        self.ui.startButtons.hide()
+        self.ui.movingPage.hide()
 
         self.field_data: List[List[Tuple[float, float]]] = [[]]
         self.waypoint = []
         self._moving_stop = False
+        self.current_filename = 'field_data/test.as'
         # self.focal = None
 
         self.gps = GPS()
@@ -66,8 +77,34 @@ class AutoSlasher(QMainWindow):
         self._gps_stop = threading.Event()
         self.path_thread = threading.Thread(target=self.set_generated_path)
 
-        # self.compass = Magnetometer()
-        # self.robot = Robot()
+    def hide_all_widget(self):
+        self.ui.startPage.hide()
+        self.ui.settingPage.hide()
+        self.ui.fmanagerPage.hide()
+        self.ui.fieldPage.hide()
+        self.ui.movingPage.hide()
+
+    def to_main_page(self):
+        self.ui.startPage.show()
+        self.ui.startButtons.hide()
+
+    def to_start_page(self):
+        self.hide_all_widget()
+        self.ui.startButtons.show()
+        self.ui.startPage.show()
+        self.ui.movingPage.show()
+        self.ui.nextPage.hide()
+
+    def to_setting_page(self):
+        self.ui.startPage.hide()
+        self.ui.settingPage.show()
+
+    def to_field_manager_page(self):
+        if self.gps.isRunning():
+            self.gps.stop()
+        self.ui.startPage.hide()
+        self.ui.fieldPage.hide()
+        self.ui.fmanagerPage.show()
 
     def to_record_field_page(self):
         self.ui.fmanagerPage.hide()
@@ -84,6 +121,7 @@ class AutoSlasher(QMainWindow):
 
     def to_open_field_page(self):
         self.ui.startPage.hide()
+        self.ui.movingPage.hide()
         self.ui.fmanagerPage.hide()
         self.ui.settingPage.hide()
         self.ui.movingPage.hide()
@@ -94,7 +132,34 @@ class AutoSlasher(QMainWindow):
         self.ui.recordWidget.hide()
         self.ui.displayWidget.show()
 
-        self.load_file('test.as')
+        self.load_file()
+
+    def to_prev_page(self):
+        if self.ui.startPage.isVisible():
+            self.ui.startButtons.hide()
+            self.ui.movingPage.hide()
+        elif self.ui.settingPage.isVisible() or self.ui.fmanagerPage.isVisible():
+            self.to_start_page()
+        elif self.ui.positionWidget.isVisible():
+            self.to_open_field_page()
+
+    def discard_field(self):
+        self.ui.sureWidget.show()
+
+    def on_sure_yes(self):
+        self.to_field_manager_page()
+
+    def on_sure_no(self):
+        self.ui.sureWidget.hide()
+
+    def to_next_page(self):
+        pass
+
+    def on_start_button(self):
+        if self.ui.startButtons.isVisible():
+            self.to_open_field_page()
+        else:
+            self.to_start_page()
 
     def handle_activated(self, index):
         self.ui.combo_field.blockSignals(True)
@@ -112,49 +177,23 @@ class AutoSlasher(QMainWindow):
         gps_data = self.gps.get_data()
         return extract_from_gps(gps_data)
 
-    # def follow_path(self):
-    #     for i in range(1, len(self.waypoint)):
-    #         self.navigate_to_waypoint(self.waypoint[i])
-    #
-    # def navigate_to_waypoint(self, waypoint):
-    #     while True:
-    #         current_position = self.get_position()
-    #         distance = distance_to_waypoint(current_position, waypoint)
-    #         if distance < POSITION_TOLERANCE:
-    #             logger.debug(f'Reached waypoint : {waypoint}')
-    #             return
-    #         target_heading = calculate_heading_to_waypoint(current_position, waypoint)
-    #         heading_error = (target_heading - self.compass.read_heading() + 360) % 360
-    #         if heading_error > 180:
-    #             heading_error -= 360
-    #
-    #         k_p_heading = 0.1  # Proportional gain for heading
-    #         k_p_position = 0.01
-    #
-    #         heading_correction = k_p_heading * heading_error
-    #         speed_correction = k_p_position * distance
-    #         base_speed = 0.5
-    #
-    #         left_speed = base_speed - heading_correction + speed_correction
-    #         right_speed = base_speed + heading_correction + speed_correction
-    #
-    #         # Adjust motor speed based on the position and heading corrections
-    #         self.robot.set_motors(left_speed=clip_speed(left_speed),
-    #                               right_speed=clip_speed(right_speed))
-    #
-    #         time.sleep(0.1)
-
     def start_recording_boundary(self):
         logger.info('Starting recording boundary...')
+        self.recordingDlg.set_type("boundary")
+        self.recordingDlg.show()
         self.field_data[0].clear()
         self.ui.displayWidget.clear_bnd_point()
+        self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
         self.scheduler_thread.start()
 
     def start_recording_obstacle(self):
         logger.info('Starting recording obstacle...')
+        self.recordingDlg.set_type("obstacle")
+        self.recordingDlg.show()
         self.field_data.append([])
         self.ui.displayWidget.add_new_obs()
+        self._gps_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(len(self.field_data) - 1,))
         self.scheduler_thread.start()
 
@@ -164,8 +203,7 @@ class AutoSlasher(QMainWindow):
             self._gps_stop.set()
             self.scheduler_thread.join()
             logger.info('Schedule stopped')
-            if self.gps.isRunning():
-                self.gps.stop()
+            self.recordingDlg.hide()
 
     def save_gps_data(self, index):
         x, y = self.get_position()
@@ -179,9 +217,10 @@ class AutoSlasher(QMainWindow):
         else:
             logger.error("Conversion failed.")
 
-    def load_file(self, filename):
+    def load_file(self):
         self.field_data.clear()
         self.waypoint.clear()
+        filename = self.current_filename
         logger.info(f'Loading {filename}...')
         with open(filename, 'r') as file:
             current_list: List[Tuple[float, float]] = []
@@ -227,7 +266,9 @@ class AutoSlasher(QMainWindow):
 
     def save_file(self):
         name_dlg = NameDlg(self)
-        name_dlg.exec()
+        if name_dlg.exec() != QDialog.accepted:
+            logger.info("Name Input Dialog Closed.")
+            return
         filename = name_dlg.get_name() + ".as"
         logger.debug(f"File name : {filename}")
         with open(filename, 'w') as file:
@@ -247,8 +288,6 @@ class AutoSlasher(QMainWindow):
         schedule.clear()
         if self.path_thread.is_alive():
             self.path_thread.join(.1)
-        # if self.compass:
-        #     del self.compass
         return super().closeEvent(event)
 
 

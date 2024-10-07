@@ -47,7 +47,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QWidget" name="widget_13" native="true">
+        <widget class="QWidget" name="startButtons" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <spacer name="horizontalSpacer_3">
@@ -5193,7 +5193,7 @@ Field : Front Yard1</string>
            <number>0</number>
           </property>
           <item>
-           <widget class="QToolButton" name="prevField">
+           <widget class="QToolButton" name="prevPage">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
               <horstretch>0</horstretch>
@@ -5238,7 +5238,7 @@ Field : Front Yard1</string>
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="nextField">
+           <widget class="QToolButton" name="nextPage">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
               <horstretch>0</horstretch>
