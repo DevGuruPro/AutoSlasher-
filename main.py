@@ -5,13 +5,15 @@ import schedule
 import time
 from typing import List, Tuple
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog
+from PySide6 import QtCore
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem
 
-from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE
+from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE, DATABASE_PATH
 from ui.ui_as import Ui_AS
 
 from utils.commons import (extract_from_gps, generate_path, calculate_heading_to_waypoint,
-                           distance_to_waypoint, clip_speed)
+                           distance_to_waypoint, clip_speed, find_as_files)
 
 from utils.simplertk2b import GPS
 from utils.logger import logger
@@ -29,13 +31,7 @@ class AutoSlasher(QMainWindow):
         self.ui.setupUi(self)
         # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
         # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        # self.showFullScreen()
-
-        # self.ui.combo_field.addItem("Option 1")
-        # self.ui.combo_field.addItem("Option 2")
-        # self.ui.combo_field.addItem("Option 3")
-        # self.ui.displayWidget = DisplayBoard()
-        self.ui.combo_field.currentIndexChanged.connect(self.handle_activated)
+        self.showFullScreen()
 
         self.loadingDlg = LoadingDlg(self)
         self.loadingDlg.hide()
@@ -70,7 +66,7 @@ class AutoSlasher(QMainWindow):
         self.field_data: List[List[Tuple[float, float]]] = [[]]
         self.waypoint = []
         self._moving_stop = False
-        self.current_filename = 'field_data/test.as'
+        self.current_filename = ''
         # self.focal = None
 
         self.gps = GPS()
@@ -95,12 +91,19 @@ class AutoSlasher(QMainWindow):
         self.ui.startPage.show()
         self.ui.movingPage.show()
         self.ui.nextPage.hide()
+        self.ui.combo_field.clear()
+        database = find_as_files()
+        for path in database:
+            self.ui.combo_field.addItem(path[:-3])
 
     def to_setting_page(self):
         self.ui.startPage.hide()
         self.ui.settingPage.show()
 
     def to_field_manager_page(self):
+        database = find_as_files()
+        for i in range(len(database)):
+            self.ui.field_table.setItem(i, 0, QTableWidgetItem(database[i][:-3]))
         if self.gps.isRunning():
             self.gps.stop()
         self.ui.startPage.hide()
@@ -139,6 +142,8 @@ class AutoSlasher(QMainWindow):
         self.ui.recordWidget.hide()
         self.ui.displayWidget.show()
 
+        self.current_filename = self.ui.combo_field.currentText() + '.as'
+        logger.info(self.current_filename)
         self.load_file()
 
     def to_prev_page(self):
@@ -167,11 +172,6 @@ class AutoSlasher(QMainWindow):
             self.to_open_field_page()
         else:
             self.to_start_page()
-
-    def handle_activated(self, index):
-        self.ui.combo_field.blockSignals(True)
-        self.ui.combo_field.setCurrentText(f"Selected Field: {self.ui.combo_field.itemText(index)}")
-        self.ui.combo_field.blockSignals(False)
 
     def start_scheduler(self, index):
         schedule.clear()
@@ -227,7 +227,7 @@ class AutoSlasher(QMainWindow):
     def load_file(self):
         self.field_data.clear()
         self.waypoint.clear()
-        filename = self.current_filename
+        filename = DATABASE_PATH + '/' + self.current_filename
         logger.info(f'Loading {filename}...')
         with open(filename, 'r') as file:
             current_list: List[Tuple[float, float]] = []
@@ -302,8 +302,5 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = AutoSlasher()
-    screen_geometry = app.primaryScreen().geometry()
-    screen_geometry.adjust(50, 50, -50, -50)
-    window.setGeometry(screen_geometry)
     window.show()
     sys.exit(app.exec())

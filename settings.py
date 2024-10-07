@@ -25,6 +25,8 @@ Error_MSG = [
     "AutoSlasher is of bounds, manually drive out of the exclusion zone to start the field."
 ]
 
+DATABASE_PATH = "field_data"
+
 GPS_STAT_MSG = [
     "GPS Quality: Excellent",
     "GPS Quality: Poor",

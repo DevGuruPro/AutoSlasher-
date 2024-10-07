@@ -15,8 +15,8 @@ class NameDlg(QDialog):
         super().__init__(parent=app)
         self.ui = Ui_NameDialog()
         self.ui.setupUi(self)
-        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
-        # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.ui.setBtn.released.connect(self.close)
 

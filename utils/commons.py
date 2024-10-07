@@ -1,10 +1,12 @@
 import math
+import os
+
 from pyproj import Transformer
 import numpy as np
 from shapely.geometry import Polygon, LineString, MultiPolygon
 import networkx as nx
 
-from settings import CALIBRATION, MAGNETIC_DECLINATION
+from settings import CALIBRATION, MAGNETIC_DECLINATION, DATABASE_PATH
 from utils.logger import logger
 
 
@@ -220,3 +222,12 @@ def clip_speed(value):
     """ Clip the speed within the boundaries of -MAX_SPEED to MAX_SPEED. """
     return max(min(value, 1.0), -1.0)
 
+
+def find_as_files():
+    as_files = []
+    # List all files in the given directory
+    for file in os.listdir(os.getcwd()+'/'+DATABASE_PATH):
+        # Check if the file extension is .as
+        if file.endswith('.as'):
+            as_files.append(file)
+    return as_files

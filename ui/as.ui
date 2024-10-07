@@ -571,18 +571,8 @@ QComboBox:pressed {
 }  </string>
                   </property>
                   <property name="currentText">
-                   <string>Field 1</string>
+                   <string/>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>Field 1</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Field 2</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                </layout>
@@ -1198,7 +1188,7 @@ QPushButton:pressed {
            </spacer>
           </item>
           <item>
-           <widget class="QTableWidget" name="settingTable_2">
+           <widget class="QTableWidget" name="field_table">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
