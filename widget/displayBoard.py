@@ -42,9 +42,11 @@ class DisplayBoard(QWidget):
         center_x = (min_x + max_x) / 2
         center_y = (min_y + max_y) / 2
 
-        self.bounding_rect.setRect(min_x, min_y, max_x, max_y)
+        logger.info(f"{min_x}, {min_y}, {max_x}, {max_y}")
+        self.bounding_rect.setRect(self.rect().center().x()+min_x-center_x, self.rect().center().y()+min_y-center_y,
+                                   max_x-min_x, max_y-min_y)
+        logger.info(self.bounding_rect)
         self.outline_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
-
         for (x, y) in field_data[0]:
             new_point = QPoint(self.outline_rect.center().x() + x - center_x,
                                self.outline_rect.center().y() + y - center_y)
@@ -63,6 +65,7 @@ class DisplayBoard(QWidget):
                        self.outline_rect.center().y() + int(y) - center_y))
 
         self.adjust_scale_to_fit()
+        print(self.scale)
         self.update()
 
     def clear_bnd_point(self):
@@ -119,7 +122,9 @@ class DisplayBoard(QWidget):
         #     painter.drawLine(rect.left(), y, rect.right(), y)
         #     y += self.grid_size
 
+        painter.translate(self.rect().center())
         painter.scale(self.scale, self.scale)
+        painter.translate(-self.rect().center())
 
         if self.bnd_points:
             pen = QPen(QColor(255, 0, 0))

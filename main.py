@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 from PySide6 import QtCore
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QHeaderView
 
 from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE, DATABASE_PATH
 from ui.ui_as import Ui_AS
@@ -56,6 +56,17 @@ class AutoSlasher(QMainWindow):
         self.ui.stopGuid.clicked.connect(self.to_start_page)
         self.ui.prevPage.clicked.connect(self.to_prev_page)
         self.ui.nextPage.clicked.connect(self.to_next_page)
+
+        self.ui.settingTable.setFixedWidth(369)
+        self.ui.settingTable.setFixedHeight(206)
+        self.ui.settingTable.setColumnWidth(0, 250)
+        self.ui.settingTable.setColumnWidth(1, 60)
+        self.ui.settingTable.setColumnWidth(2, 40)
+
+        self.ui.field_table.setFixedWidth(300)
+        self.ui.field_table.setFixedHeight(206)
+        self.ui.field_table.setColumnWidth(0, 200)
+        self.ui.field_table.setColumnWidth(1, 98)
 
         self.ui.settingPage.hide()
         self.ui.fmanagerPage.hide()
