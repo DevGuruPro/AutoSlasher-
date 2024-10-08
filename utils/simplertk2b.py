@@ -47,8 +47,10 @@ class GPS(QThread):
                     label, attr = field[:2]
                     value = getattr(msg, attr)
                     self._data[attr] = value
-                logger.debug(f'gps-data : {self._data}')
-                self.sig_msg.emit(GPS_STAT_MSG[0])
+                if self._data.get("gps_qual") in [4, 5]:
+                    self.sig_msg.emit(GPS_STAT_MSG[0])
+                else:
+                    self.sig_msg.emit(GPS_STAT_MSG[2])
             except pynmea2.ParseError as e:
                 logger.error(f"Parse error: {e}")
                 self.sig_msg.emit(GPS_STAT_MSG[2])

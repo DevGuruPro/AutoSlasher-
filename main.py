@@ -30,7 +30,7 @@ class AutoSlasher(QMainWindow):
         super().__init__()
         self.ui = Ui_AS()
         self.ui.setupUi(self)
-        # self.showFullScreen()
+        self.showFullScreen()
 
         self.loadingDlg = LoadingDlg(self)
         self.loadingDlg.hide()
