@@ -317,8 +317,8 @@ class Ui_AS(object):
         self.settingTable.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
         self.settingTable.setHorizontalHeaderItem(2, __qtablewidgetitem2)
-        if (self.settingTable.rowCount() < 6):
-            self.settingTable.setRowCount(6)
+        if (self.settingTable.rowCount() < 8):
+            self.settingTable.setRowCount(8)
         __qtablewidgetitem3 = QTableWidgetItem()
         self.settingTable.setVerticalHeaderItem(0, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
@@ -332,29 +332,41 @@ class Ui_AS(object):
         __qtablewidgetitem8 = QTableWidgetItem()
         self.settingTable.setVerticalHeaderItem(5, __qtablewidgetitem8)
         __qtablewidgetitem9 = QTableWidgetItem()
-        self.settingTable.setItem(0, 0, __qtablewidgetitem9)
+        self.settingTable.setVerticalHeaderItem(6, __qtablewidgetitem9)
         __qtablewidgetitem10 = QTableWidgetItem()
-        self.settingTable.setItem(0, 1, __qtablewidgetitem10)
+        self.settingTable.setVerticalHeaderItem(7, __qtablewidgetitem10)
         __qtablewidgetitem11 = QTableWidgetItem()
-        self.settingTable.setItem(1, 0, __qtablewidgetitem11)
+        self.settingTable.setItem(0, 0, __qtablewidgetitem11)
         __qtablewidgetitem12 = QTableWidgetItem()
-        self.settingTable.setItem(1, 1, __qtablewidgetitem12)
+        self.settingTable.setItem(0, 1, __qtablewidgetitem12)
         __qtablewidgetitem13 = QTableWidgetItem()
-        self.settingTable.setItem(2, 0, __qtablewidgetitem13)
+        self.settingTable.setItem(1, 0, __qtablewidgetitem13)
         __qtablewidgetitem14 = QTableWidgetItem()
-        self.settingTable.setItem(2, 1, __qtablewidgetitem14)
+        self.settingTable.setItem(1, 1, __qtablewidgetitem14)
         __qtablewidgetitem15 = QTableWidgetItem()
-        self.settingTable.setItem(3, 0, __qtablewidgetitem15)
+        self.settingTable.setItem(2, 0, __qtablewidgetitem15)
         __qtablewidgetitem16 = QTableWidgetItem()
-        self.settingTable.setItem(3, 1, __qtablewidgetitem16)
+        self.settingTable.setItem(2, 1, __qtablewidgetitem16)
         __qtablewidgetitem17 = QTableWidgetItem()
-        self.settingTable.setItem(4, 0, __qtablewidgetitem17)
+        self.settingTable.setItem(3, 0, __qtablewidgetitem17)
         __qtablewidgetitem18 = QTableWidgetItem()
-        self.settingTable.setItem(4, 1, __qtablewidgetitem18)
+        self.settingTable.setItem(3, 1, __qtablewidgetitem18)
         __qtablewidgetitem19 = QTableWidgetItem()
-        self.settingTable.setItem(5, 0, __qtablewidgetitem19)
+        self.settingTable.setItem(4, 0, __qtablewidgetitem19)
         __qtablewidgetitem20 = QTableWidgetItem()
-        self.settingTable.setItem(5, 1, __qtablewidgetitem20)
+        self.settingTable.setItem(4, 1, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        self.settingTable.setItem(5, 0, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        self.settingTable.setItem(5, 1, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        self.settingTable.setItem(6, 0, __qtablewidgetitem23)
+        __qtablewidgetitem24 = QTableWidgetItem()
+        self.settingTable.setItem(6, 1, __qtablewidgetitem24)
+        __qtablewidgetitem25 = QTableWidgetItem()
+        self.settingTable.setItem(7, 0, __qtablewidgetitem25)
+        __qtablewidgetitem26 = QTableWidgetItem()
+        self.settingTable.setItem(7, 1, __qtablewidgetitem26)
         self.settingTable.setObjectName(u"settingTable")
         sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy5.setHorizontalStretch(0)
@@ -471,48 +483,48 @@ class Ui_AS(object):
         self.field_table = QTableWidget(self.widget_26)
         if (self.field_table.columnCount() < 2):
             self.field_table.setColumnCount(2)
-        __qtablewidgetitem21 = QTableWidgetItem()
-        self.field_table.setHorizontalHeaderItem(0, __qtablewidgetitem21)
-        __qtablewidgetitem22 = QTableWidgetItem()
-        self.field_table.setHorizontalHeaderItem(1, __qtablewidgetitem22)
+        __qtablewidgetitem27 = QTableWidgetItem()
+        self.field_table.setHorizontalHeaderItem(0, __qtablewidgetitem27)
+        __qtablewidgetitem28 = QTableWidgetItem()
+        self.field_table.setHorizontalHeaderItem(1, __qtablewidgetitem28)
         if (self.field_table.rowCount() < 6):
             self.field_table.setRowCount(6)
-        __qtablewidgetitem23 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(0, __qtablewidgetitem23)
-        __qtablewidgetitem24 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(1, __qtablewidgetitem24)
-        __qtablewidgetitem25 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(2, __qtablewidgetitem25)
-        __qtablewidgetitem26 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(3, __qtablewidgetitem26)
-        __qtablewidgetitem27 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(4, __qtablewidgetitem27)
-        __qtablewidgetitem28 = QTableWidgetItem()
-        self.field_table.setVerticalHeaderItem(5, __qtablewidgetitem28)
         __qtablewidgetitem29 = QTableWidgetItem()
-        self.field_table.setItem(0, 0, __qtablewidgetitem29)
+        self.field_table.setVerticalHeaderItem(0, __qtablewidgetitem29)
         __qtablewidgetitem30 = QTableWidgetItem()
-        self.field_table.setItem(0, 1, __qtablewidgetitem30)
+        self.field_table.setVerticalHeaderItem(1, __qtablewidgetitem30)
         __qtablewidgetitem31 = QTableWidgetItem()
-        self.field_table.setItem(1, 0, __qtablewidgetitem31)
+        self.field_table.setVerticalHeaderItem(2, __qtablewidgetitem31)
         __qtablewidgetitem32 = QTableWidgetItem()
-        self.field_table.setItem(1, 1, __qtablewidgetitem32)
+        self.field_table.setVerticalHeaderItem(3, __qtablewidgetitem32)
         __qtablewidgetitem33 = QTableWidgetItem()
-        self.field_table.setItem(2, 0, __qtablewidgetitem33)
+        self.field_table.setVerticalHeaderItem(4, __qtablewidgetitem33)
         __qtablewidgetitem34 = QTableWidgetItem()
-        self.field_table.setItem(2, 1, __qtablewidgetitem34)
+        self.field_table.setVerticalHeaderItem(5, __qtablewidgetitem34)
         __qtablewidgetitem35 = QTableWidgetItem()
-        self.field_table.setItem(3, 0, __qtablewidgetitem35)
+        self.field_table.setItem(0, 0, __qtablewidgetitem35)
         __qtablewidgetitem36 = QTableWidgetItem()
-        self.field_table.setItem(3, 1, __qtablewidgetitem36)
+        self.field_table.setItem(0, 1, __qtablewidgetitem36)
         __qtablewidgetitem37 = QTableWidgetItem()
-        self.field_table.setItem(4, 0, __qtablewidgetitem37)
+        self.field_table.setItem(1, 0, __qtablewidgetitem37)
         __qtablewidgetitem38 = QTableWidgetItem()
-        self.field_table.setItem(4, 1, __qtablewidgetitem38)
+        self.field_table.setItem(1, 1, __qtablewidgetitem38)
         __qtablewidgetitem39 = QTableWidgetItem()
-        self.field_table.setItem(5, 0, __qtablewidgetitem39)
+        self.field_table.setItem(2, 0, __qtablewidgetitem39)
         __qtablewidgetitem40 = QTableWidgetItem()
-        self.field_table.setItem(5, 1, __qtablewidgetitem40)
+        self.field_table.setItem(2, 1, __qtablewidgetitem40)
+        __qtablewidgetitem41 = QTableWidgetItem()
+        self.field_table.setItem(3, 0, __qtablewidgetitem41)
+        __qtablewidgetitem42 = QTableWidgetItem()
+        self.field_table.setItem(3, 1, __qtablewidgetitem42)
+        __qtablewidgetitem43 = QTableWidgetItem()
+        self.field_table.setItem(4, 0, __qtablewidgetitem43)
+        __qtablewidgetitem44 = QTableWidgetItem()
+        self.field_table.setItem(4, 1, __qtablewidgetitem44)
+        __qtablewidgetitem45 = QTableWidgetItem()
+        self.field_table.setItem(5, 0, __qtablewidgetitem45)
+        __qtablewidgetitem46 = QTableWidgetItem()
+        self.field_table.setItem(5, 1, __qtablewidgetitem46)
         self.field_table.setObjectName(u"field_table")
         sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Minimum)
         sizePolicy6.setHorizontalStretch(0)
@@ -1478,58 +1490,70 @@ class Ui_AS(object):
         ___qtablewidgetitem5 = self.settingTable.verticalHeaderItem(2)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("AS", u"3", None));
         ___qtablewidgetitem6 = self.settingTable.verticalHeaderItem(3)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("AS", u"4", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("AS", u"New Row", None));
         ___qtablewidgetitem7 = self.settingTable.verticalHeaderItem(4)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("AS", u"5", None));
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("AS", u"New Row", None));
         ___qtablewidgetitem8 = self.settingTable.verticalHeaderItem(5)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("AS", u"6", None));
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("AS", u"4", None));
+        ___qtablewidgetitem9 = self.settingTable.verticalHeaderItem(6)
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("AS", u"5", None));
+        ___qtablewidgetitem10 = self.settingTable.verticalHeaderItem(7)
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("AS", u"6", None));
 
         __sortingEnabled = self.settingTable.isSortingEnabled()
         self.settingTable.setSortingEnabled(False)
-        ___qtablewidgetitem9 = self.settingTable.item(0, 0)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("AS", u"SPEED", None));
-        ___qtablewidgetitem10 = self.settingTable.item(0, 1)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("AS", u"%", None));
-        ___qtablewidgetitem11 = self.settingTable.item(1, 0)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("AS", u"OVERLAP", None));
-        ___qtablewidgetitem12 = self.settingTable.item(1, 1)
+        ___qtablewidgetitem11 = self.settingTable.item(0, 0)
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("AS", u"SPEED", None));
+        ___qtablewidgetitem12 = self.settingTable.item(0, 1)
         ___qtablewidgetitem12.setText(QCoreApplication.translate("AS", u"%", None));
-        ___qtablewidgetitem13 = self.settingTable.item(2, 0)
-        ___qtablewidgetitem13.setText(QCoreApplication.translate("AS", u"BOUNDARY AVOIDANCE", None));
-        ___qtablewidgetitem14 = self.settingTable.item(2, 1)
-        ___qtablewidgetitem14.setText(QCoreApplication.translate("AS", u"MM", None));
-        ___qtablewidgetitem15 = self.settingTable.item(3, 0)
-        ___qtablewidgetitem15.setText(QCoreApplication.translate("AS", u"OBSTACLE AVOIDANCE", None));
-        ___qtablewidgetitem16 = self.settingTable.item(3, 1)
+        ___qtablewidgetitem13 = self.settingTable.item(1, 0)
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("AS", u"OVERLAP", None));
+        ___qtablewidgetitem14 = self.settingTable.item(1, 1)
+        ___qtablewidgetitem14.setText(QCoreApplication.translate("AS", u"%", None));
+        ___qtablewidgetitem15 = self.settingTable.item(2, 0)
+        ___qtablewidgetitem15.setText(QCoreApplication.translate("AS", u"BOUNDARY AVOIDANCE", None));
+        ___qtablewidgetitem16 = self.settingTable.item(2, 1)
         ___qtablewidgetitem16.setText(QCoreApplication.translate("AS", u"MM", None));
-        ___qtablewidgetitem17 = self.settingTable.item(4, 0)
-        ___qtablewidgetitem17.setText(QCoreApplication.translate("AS", u"FIELD AUTO CORRECT", None));
-        ___qtablewidgetitem18 = self.settingTable.item(4, 1)
+        ___qtablewidgetitem17 = self.settingTable.item(3, 0)
+        ___qtablewidgetitem17.setText(QCoreApplication.translate("AS", u"MACHINE WIDTH", None));
+        ___qtablewidgetitem18 = self.settingTable.item(3, 1)
         ___qtablewidgetitem18.setText(QCoreApplication.translate("AS", u"MM", None));
-        ___qtablewidgetitem19 = self.settingTable.item(5, 0)
-        ___qtablewidgetitem19.setText(QCoreApplication.translate("AS", u"OUT OF BOUNDS TOLERANCE", None));
-        ___qtablewidgetitem20 = self.settingTable.item(5, 1)
+        ___qtablewidgetitem19 = self.settingTable.item(4, 0)
+        ___qtablewidgetitem19.setText(QCoreApplication.translate("AS", u"OFFSET PATHS", None));
+        ___qtablewidgetitem20 = self.settingTable.item(4, 1)
         ___qtablewidgetitem20.setText(QCoreApplication.translate("AS", u"MM", None));
+        ___qtablewidgetitem21 = self.settingTable.item(5, 0)
+        ___qtablewidgetitem21.setText(QCoreApplication.translate("AS", u"OBSTACLE AVOIDANCE", None));
+        ___qtablewidgetitem22 = self.settingTable.item(5, 1)
+        ___qtablewidgetitem22.setText(QCoreApplication.translate("AS", u"MM", None));
+        ___qtablewidgetitem23 = self.settingTable.item(6, 0)
+        ___qtablewidgetitem23.setText(QCoreApplication.translate("AS", u"FIELD AUTO CORRECT", None));
+        ___qtablewidgetitem24 = self.settingTable.item(6, 1)
+        ___qtablewidgetitem24.setText(QCoreApplication.translate("AS", u"MM", None));
+        ___qtablewidgetitem25 = self.settingTable.item(7, 0)
+        ___qtablewidgetitem25.setText(QCoreApplication.translate("AS", u"OUT OF BOUNDS TOLERANCE", None));
+        ___qtablewidgetitem26 = self.settingTable.item(7, 1)
+        ___qtablewidgetitem26.setText(QCoreApplication.translate("AS", u"MM", None));
         self.settingTable.setSortingEnabled(__sortingEnabled)
 
         self.label_11.setText(QCoreApplication.translate("AS", u"Field Manager", None))
         self.createFieldBtn.setText(QCoreApplication.translate("AS", u"Create New Field", None))
-        ___qtablewidgetitem21 = self.field_table.horizontalHeaderItem(0)
-        ___qtablewidgetitem21.setText(QCoreApplication.translate("AS", u"Field Name", None));
-        ___qtablewidgetitem22 = self.field_table.horizontalHeaderItem(1)
-        ___qtablewidgetitem22.setText(QCoreApplication.translate("AS", u"Delete", None));
-        ___qtablewidgetitem23 = self.field_table.verticalHeaderItem(0)
-        ___qtablewidgetitem23.setText(QCoreApplication.translate("AS", u"1", None));
-        ___qtablewidgetitem24 = self.field_table.verticalHeaderItem(1)
-        ___qtablewidgetitem24.setText(QCoreApplication.translate("AS", u"2", None));
-        ___qtablewidgetitem25 = self.field_table.verticalHeaderItem(2)
-        ___qtablewidgetitem25.setText(QCoreApplication.translate("AS", u"3", None));
-        ___qtablewidgetitem26 = self.field_table.verticalHeaderItem(3)
-        ___qtablewidgetitem26.setText(QCoreApplication.translate("AS", u"4", None));
-        ___qtablewidgetitem27 = self.field_table.verticalHeaderItem(4)
-        ___qtablewidgetitem27.setText(QCoreApplication.translate("AS", u"5", None));
-        ___qtablewidgetitem28 = self.field_table.verticalHeaderItem(5)
-        ___qtablewidgetitem28.setText(QCoreApplication.translate("AS", u"6", None));
+        ___qtablewidgetitem27 = self.field_table.horizontalHeaderItem(0)
+        ___qtablewidgetitem27.setText(QCoreApplication.translate("AS", u"Field Name", None));
+        ___qtablewidgetitem28 = self.field_table.horizontalHeaderItem(1)
+        ___qtablewidgetitem28.setText(QCoreApplication.translate("AS", u"Delete", None));
+        ___qtablewidgetitem29 = self.field_table.verticalHeaderItem(0)
+        ___qtablewidgetitem29.setText(QCoreApplication.translate("AS", u"1", None));
+        ___qtablewidgetitem30 = self.field_table.verticalHeaderItem(1)
+        ___qtablewidgetitem30.setText(QCoreApplication.translate("AS", u"2", None));
+        ___qtablewidgetitem31 = self.field_table.verticalHeaderItem(2)
+        ___qtablewidgetitem31.setText(QCoreApplication.translate("AS", u"3", None));
+        ___qtablewidgetitem32 = self.field_table.verticalHeaderItem(3)
+        ___qtablewidgetitem32.setText(QCoreApplication.translate("AS", u"4", None));
+        ___qtablewidgetitem33 = self.field_table.verticalHeaderItem(4)
+        ___qtablewidgetitem33.setText(QCoreApplication.translate("AS", u"5", None));
+        ___qtablewidgetitem34 = self.field_table.verticalHeaderItem(5)
+        ___qtablewidgetitem34.setText(QCoreApplication.translate("AS", u"6", None));
 
         __sortingEnabled1 = self.field_table.isSortingEnabled()
         self.field_table.setSortingEnabled(False)

@@ -56,14 +56,14 @@ class AutoSlasher(QMainWindow):
         self.ui.prevPage.clicked.connect(self.to_prev_page)
         self.ui.nextPage.clicked.connect(self.to_next_page)
 
-        self.ui.settingTable.setFixedWidth(369)
-        self.ui.settingTable.setFixedHeight(206)
+        self.ui.settingTable.setFixedWidth(500)
+        self.ui.settingTable.setFixedHeight(400)
         self.ui.settingTable.setColumnWidth(0, 250)
         self.ui.settingTable.setColumnWidth(1, 60)
         self.ui.settingTable.setColumnWidth(2, 40)
 
-        self.ui.field_table.setFixedWidth(300)
-        self.ui.field_table.setFixedHeight(206)
+        self.ui.field_table.setFixedWidth(500)
+        self.ui.field_table.setFixedHeight(400)
         self.ui.field_table.setColumnWidth(0, 200)
         self.ui.field_table.setColumnWidth(1, 98)
 
@@ -318,6 +318,7 @@ class AutoSlasher(QMainWindow):
                     file.write(f"{self.field_data[i][j]}\n")
 
     def show_gps_status(self, status):
+        logger.info(f'STAT:{status}')
         self.ui.gps_sts.setText(status)
         if status != GPS_STAT_MSG[0]:
             self.ui.displayWidget.init_current()
