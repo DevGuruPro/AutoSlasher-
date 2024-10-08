@@ -9,11 +9,12 @@ from PySide6 import QtCore
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QHeaderView
 
-from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE, DATABASE_PATH
+from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE, DATABASE_PATH, GPS_STAT_MSG
 from ui.ui_as import Ui_AS
 
 from utils.commons import (extract_from_gps, generate_path, calculate_heading_to_waypoint,
                            distance_to_waypoint, clip_speed, find_as_files)
+from utils.magnetometer import Magnetometer
 
 from utils.simplertk2b import GPS
 from utils.logger import logger
@@ -29,8 +30,6 @@ class AutoSlasher(QMainWindow):
         super().__init__()
         self.ui = Ui_AS()
         self.ui.setupUi(self)
-        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Qt.WindowType.Popup
-        # self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.showFullScreen()
 
         self.loadingDlg = LoadingDlg(self)
@@ -78,12 +77,19 @@ class AutoSlasher(QMainWindow):
         self.waypoint = []
         self._moving_stop = False
         self.current_filename = ''
+        self.is_showing_board = False
         # self.focal = None
 
-        self.gps = GPS()
+        self.gps = GPS(port=SERIAL_PORT, baud_rate=BAUD_RATE)
+        self.gps.sig_msg.connect(self.show_gps_status)
+        self.gps.start()
+        self._recording_stop = threading.Event()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler)
-        self._gps_stop = threading.Event()
         self.path_thread = threading.Thread(target=self.set_generated_path)
+        self.current_location_thread = threading.Thread(target=self.set_current_location)
+        self.current_location_thread.start()
+
+        self.compass = Magnetometer()
 
     def hide_all_widget(self):
         self.ui.startPage.hide()
@@ -93,10 +99,12 @@ class AutoSlasher(QMainWindow):
         self.ui.movingPage.hide()
 
     def to_main_page(self):
+        self.is_showing_board = False
         self.ui.startPage.show()
         self.ui.startButtons.hide()
 
     def to_start_page(self):
+        self.is_showing_board = False
         self.hide_all_widget()
         self.ui.startButtons.show()
         self.ui.startPage.show()
@@ -108,21 +116,22 @@ class AutoSlasher(QMainWindow):
             self.ui.combo_field.addItem(path[:-3])
 
     def to_setting_page(self):
+        self.is_showing_board = False
         self.ui.startPage.hide()
         self.ui.settingPage.show()
 
     def to_field_manager_page(self):
+        self.is_showing_board = False
         database = find_as_files()
         for i in range(len(database)):
             self.ui.field_table.setItem(i, 0, QTableWidgetItem(database[i][:-3]))
-        if self.gps.isRunning():
-            self.gps.stop()
         self.ui.startPage.hide()
         self.ui.fieldPage.hide()
         self.ui.fmanagerPage.show()
         self.ui.movingPage.show()
 
     def to_record_field_page(self):
+        self.is_showing_board = True
         self.ui.fmanagerPage.hide()
         self.ui.fieldPage.show()
         self.ui.movingPage.hide()
@@ -132,14 +141,14 @@ class AutoSlasher(QMainWindow):
         self.ui.sureWidget.hide()
         self.ui.recordWidget.show()
 
-        self.gps = GPS(port=SERIAL_PORT, baud_rate=BAUD_RATE)
-        self.gps.sig_msg.connect(self.show_gps_status)
-        self.gps.start()
-        self._gps_stop.clear()
+        self.ui.displayWidget.clear()
         self.field_data.clear()
+        self.field_data.append([])
         self.waypoint.clear()
 
     def to_open_field_page(self):
+        print(self.gps.isRunning())
+        self.is_showing_board = True
         self.ui.startPage.hide()
         self.ui.movingPage.hide()
         self.ui.fmanagerPage.hide()
@@ -151,7 +160,6 @@ class AutoSlasher(QMainWindow):
         self.ui.naviWidget.show()
         self.ui.positionWidget.hide()
         self.ui.recordWidget.hide()
-        self.ui.displayWidget.show()
 
         self.current_filename = self.ui.combo_field.currentText() + '.as'
         logger.info(self.current_filename)
@@ -187,9 +195,23 @@ class AutoSlasher(QMainWindow):
     def start_scheduler(self, index):
         schedule.clear()
         schedule.every(1).seconds.do(lambda: self.save_gps_data(index))
-        while not self._gps_stop.is_set():
+        while not self._recording_stop.is_set():
             schedule.run_pending()
             time.sleep(0.1)
+
+    def set_current_location(self):
+        while self.gps.isRunning():
+            if self.is_showing_board:
+                x, y = self.get_position()
+                heading = self.compass.read_heading()
+                self.ui.displayWidget.init_current()
+                if x is None or y is None:
+                    logger.error("Cannot get gps data.")
+                    continue
+                elif heading is None:
+                    logger.error("Cannot get magnetometer data.")
+                    continue
+                self.ui.displayWidget.set_location((x, y), heading)
 
     def get_position(self):
         gps_data = self.gps.get_data()
@@ -201,7 +223,7 @@ class AutoSlasher(QMainWindow):
         self.recordingDlg.show()
         self.field_data[0].clear()
         self.ui.displayWidget.clear_bnd_point()
-        self._gps_stop.clear()
+        self._recording_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(0,))
         self.scheduler_thread.start()
 
@@ -211,14 +233,14 @@ class AutoSlasher(QMainWindow):
         self.recordingDlg.show()
         self.field_data.append([])
         self.ui.displayWidget.add_new_obs()
-        self._gps_stop.clear()
+        self._recording_stop.clear()
         self.scheduler_thread = threading.Thread(target=self.start_scheduler, args=(len(self.field_data) - 1,))
         self.scheduler_thread.start()
 
     def stop_recording(self):
-        if not self._gps_stop.is_set():
+        if not self._recording_stop.is_set():
             logger.info('Stopping recording...')
-            self._gps_stop.set()
+            self._recording_stop.set()
             self.scheduler_thread.join()
             logger.info('Schedule stopped')
             self.recordingDlg.hide()
@@ -233,7 +255,7 @@ class AutoSlasher(QMainWindow):
             else:
                 self.ui.displayWidget.add_obs_point(int(x), int(y))
         else:
-            logger.error("Conversion failed.")
+            logger.error("Cannot get gps data.")
 
     def load_file(self):
         self.field_data.clear()
@@ -297,10 +319,12 @@ class AutoSlasher(QMainWindow):
 
     def show_gps_status(self, status):
         self.ui.gps_sts.setText(status)
+        if status != GPS_STAT_MSG[0]:
+            self.ui.displayWidget.init_current()
 
     def closeEvent(self, event):
         self.gps.stop()
-        self._gps_stop.set()
+        self._recording_stop.set()
         if self.scheduler_thread.is_alive():
             self.scheduler_thread.join(.1)
         schedule.clear()

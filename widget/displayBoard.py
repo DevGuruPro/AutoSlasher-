@@ -1,35 +1,244 @@
 import math
 import sys
 
-from PySide6.QtWidgets import QWidget, QMainWindow, QPushButton, QVBoxLayout, QApplication
-from PySide6.QtGui import QPainter, QPen, QColor, QBrush, QPolygon
-from PySide6.QtCore import QPoint
+from PySide6.QtWidgets import QWidget, QMainWindow, QPushButton, QVBoxLayout, QApplication, QToolButton
+from PySide6.QtGui import QPainter, QPen, QColor, QBrush, QPolygon, QIcon, QCursor, QPixmap
+from PySide6.QtCore import QPoint, QSize, Qt
 from typing import List
 
 from utils.logger import logger
 
+import ui.res_rc
 
 class DisplayBoard(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.up_btn = QToolButton(self)
+        self.up_btn.setObjectName(u"up_btn")
+        self.up_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.up_btn.setAutoRaise(True)
+        self.up_btn.setStyleSheet("""  
+                   QToolButton {  
+                       background-color: transparent;  
+                       border: none;  
+                   }  
+                   QToolButton:hover {  
+                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                   }  
+               """)
+        icon = QIcon()
+        icon.addFile(u":/img/up.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.up_btn.setIcon(icon)
+        self.up_btn.setIconSize(QSize(20, 60))
+
+        self.left_btn = QToolButton(self)
+        self.left_btn.setObjectName(u"left_btn")
+        self.left_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.left_btn.setAutoRaise(True)
+        self.left_btn.setStyleSheet("""  
+                                   QToolButton {  
+                                       background-color: transparent;  
+                                       border: none;  
+                                   }  
+                                   QToolButton:hover {  
+                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                   }  
+                               """)
+        icon = QIcon()
+        icon.addFile(u":/img/left.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.left_btn.setIcon(icon)
+        self.left_btn.setIconSize(QSize(60, 20))
+
+        self.down_btn = QToolButton(self)
+        self.down_btn.setObjectName(u"down_btn")
+        self.down_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.down_btn.setAutoRaise(True)
+        self.down_btn.setStyleSheet("""  
+                                   QToolButton {  
+                                       background-color: transparent;  
+                                       border: none;  
+                                   }  
+                                   QToolButton:hover {  
+                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                   }  
+                               """)
+        icon = QIcon()
+        icon.addFile(u":/img/down.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.down_btn.setIcon(icon)
+        self.down_btn.setIconSize(QSize(20, 60))
+
+        self.right_btn = QToolButton(self)
+        self.right_btn.setObjectName(u"right_btn")
+        self.right_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.right_btn.setAutoRaise(True)
+        self.right_btn.setStyleSheet("""  
+                                           QToolButton {  
+                                               background-color: transparent;  
+                                               border: none;  
+                                           }  
+                                           QToolButton:hover {  
+                                               background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                           }  
+                                       """)
+        icon = QIcon()
+        icon.addFile(u":/img/right.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.right_btn.setIcon(icon)
+        self.right_btn.setIconSize(QSize(60, 20))
+
+        self.fit_btn = QToolButton(self)
+        self.fit_btn.setObjectName(u"fit_btn")
+        self.fit_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.fit_btn.setAutoRaise(True)
+        self.fit_btn.setStyleSheet("""  
+                                                   QToolButton {  
+                                                       background-color: transparent;  
+                                                       border: none;  
+                                                   }  
+                                                   QToolButton:hover {  
+                                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                                   }  
+                                               """)
+        icon = QIcon()
+        icon.addFile(u":/img/fit.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.fit_btn.setIcon(icon)
+        self.fit_btn.setIconSize(QSize(40, 40))
+
+        self.zoom_in = QToolButton(self)
+        self.zoom_in.setObjectName(u"zoom_in")
+        self.zoom_in.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.zoom_in.setAutoRaise(True)
+        self.zoom_in.setStyleSheet("""  
+                                                   QToolButton {  
+                                                       background-color: transparent;  
+                                                       border: none;  
+                                                   }  
+                                                   QToolButton:hover {  
+                                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                                   }  
+                                               """)
+        icon = QIcon()
+        icon.addFile(u":/img/zin.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.zoom_in.setIcon(icon)
+        self.zoom_in.setIconSize(QSize(30, 30))
+
+        self.zoom_out = QToolButton(self)
+        self.zoom_out.setObjectName(u"right_btn")
+        self.zoom_out.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.zoom_out.setAutoRaise(True)
+        self.zoom_out.setStyleSheet("""  
+                                                   QToolButton {  
+                                                       background-color: transparent;  
+                                                       border: none;  
+                                                   }  
+                                                   QToolButton:hover {  
+                                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                                   }  
+                                               """)
+        icon = QIcon()
+        icon.addFile(u":/img/zout.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.zoom_out.setIcon(icon)
+        self.zoom_out.setIconSize(QSize(30, 30))
+
+        self.up_btn.clicked.connect(self.on_up)
+        self.down_btn.clicked.connect(self.on_down)
+        self.left_btn.clicked.connect(self.on_left)
+        self.right_btn.clicked.connect(self.on_right)
+        self.fit_btn.clicked.connect(self.on_fit)
+        self.zoom_in.clicked.connect(self.on_zoom_in)
+        self.zoom_out.clicked.connect(self.on_zoom_out)
+
         self.bnd_points = []
         self.obs_points: List[List[QPoint]] = []
         self.path_points = []
         self.scale = 1  # Initial scale factor
         # self.setFixedSize(400, 300)
         self.margin = 50
-        self.outline_rect = self.geometry().adjusted(self.margin, self.margin, -self.margin, -self.margin)
-        self.bounding_rect = self.geometry().adjusted(self.margin, self.margin, -self.margin, -self.margin)
+        self.outline_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
+        self.bounding_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
         self.grid_size = 20
         self.bnd_drawing = False
         self.obs_drawing = False
+        self.transform_x = 0
+        self.transform_y = 0
+        self.transform_scale = 1
+        self.moving_unit = 10
+        self.converted_x = 0
+        self.converted_y = 0
+        self.heading = None
+        self.current = None
+        self.update()
+
+    def on_up(self):
+        self.transform_y = self.transform_y - self.moving_unit
+        self.update()
+
+    def on_down(self):
+        self.transform_y = self.transform_y + self.moving_unit
+        self.update()
+
+    def on_left(self):
+        self.transform_x = self.transform_x - self.moving_unit
+        self.update()
+
+    def on_right(self):
+        self.transform_x = self.transform_x + self.moving_unit
+        self.update()
+
+    def on_fit(self):
+        self.transform_x = self.transform_y = 0
+        self.transform_scale = 1
+        self.update()
+
+    def on_zoom_in(self):
+        self.transform_scale = self.transform_scale + 0.2
+        self.update()
+
+    def on_zoom_out(self):
+        self.transform_scale = self.transform_scale - 0.2
+        self.update()
+
+    def resizeEvent(self, event):
+        self.up_btn.setGeometry(int(event.size().width() / 2), 10, 20, 60)
+        self.left_btn.setGeometry(10, int(event.size().height() / 2), 60, 20)
+        self.down_btn.setGeometry(int(event.size().width() / 2), event.size().height()-70, 20, 60)
+        self.right_btn.setGeometry(event.size().width()-70, int(event.size().height() / 2), 60, 20)
+        self.fit_btn.setGeometry(70, event.size().height()-100, 40, 40)
+        self.zoom_in.setGeometry(20, event.size().height()-135, 30, 30)
+        self.zoom_out.setGeometry(20, event.size().height()-95, 30, 30)
+
+    def clear(self):
+        self.bnd_points.clear()
+        self.obs_points.clear()
+        self.path_points.clear()
+        self.scale = 1
+        self.outline_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
+        self.bounding_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
+        self.grid_size = 20
+        self.bnd_drawing = False
+        self.obs_drawing = False
+        self.transform_x = 0
+        self.transform_y = 0
+        self.transform_scale = 1
+        self.moving_unit = 10
+        self.converted_x = 0
+        self.converted_y = 0
+        self.heading = None
+        self.current = None
+        self.update()
+
+    def init_current(self):
+        self.heading = None
+        self.current = None
+
+    def set_location(self, point, angle):
+        self.current = (point[0]+self.converted_x, point[1]+self.converted_y)
+        self.heading = angle
         self.update()
 
     def load_field_data(self, field_data, path):
-        self.bnd_drawing = False
-        self.obs_drawing = False
-        self.bnd_points.clear()
-        self.obs_points.clear()
+        self.clear()
+        QApplication.processEvents()
         min_x, min_y = float('inf'), float('inf')
         max_x, max_y = float('-inf'), float('-inf')
         for sublist in field_data:
@@ -42,11 +251,11 @@ class DisplayBoard(QWidget):
         center_x = (min_x + max_x) / 2
         center_y = (min_y + max_y) / 2
 
-        logger.info(f"{min_x}, {min_y}, {max_x}, {max_y}")
         self.bounding_rect.setRect(self.rect().center().x()+min_x-center_x, self.rect().center().y()+min_y-center_y,
                                    max_x-min_x, max_y-min_y)
-        logger.info(self.bounding_rect)
         self.outline_rect = self.rect().adjusted(self.margin, self.margin, -self.margin, -self.margin)
+        self.converted_x = self.outline_rect.center().x() - center_x
+        self.converted_y = self.outline_rect.center().y() - center_y
         for (x, y) in field_data[0]:
             new_point = QPoint(self.outline_rect.center().x() + x - center_x,
                                self.outline_rect.center().y() + y - center_y)
@@ -61,11 +270,10 @@ class DisplayBoard(QWidget):
         self.path_points.clear()
         for (x, y) in path:
             self.path_points.append(
-                QPoint(self.outline_rect.center().x() + int(x) - center_x,
-                       self.outline_rect.center().y() + int(y) - center_y))
+                QPoint(self.outline_rect.center().x() + x - center_x,
+                       self.outline_rect.center().y() + y - center_y))
 
         self.adjust_scale_to_fit()
-        print(self.scale)
         self.update()
 
     def clear_bnd_point(self):
@@ -111,6 +319,15 @@ class DisplayBoard(QWidget):
 
         pen.setWidth(1)
         painter.setPen(pen)
+
+        if self.current is not None and self.heading is not None:
+            painter.translate(self.current[0], self.current[1])
+            painter.save()
+            painter.rotate(self.heading)
+            arrow_image = QPixmap(u":/img/current.png")
+            painter.drawPixmap(-arrow_image.width() // 2, -arrow_image.height() // 2, arrow_image)
+            painter.restore()
+
         # rect = self.rect()
         # x = rect.left()
         # while x <= rect.right():
@@ -123,8 +340,9 @@ class DisplayBoard(QWidget):
         #     y += self.grid_size
 
         painter.translate(self.rect().center())
-        painter.scale(self.scale, self.scale)
+        painter.scale(self.scale*self.transform_scale, self.scale*self.transform_scale)
         painter.translate(-self.rect().center())
+        painter.translate(self.transform_x,self.transform_y)
 
         if self.bnd_points:
             pen = QPen(QColor(255, 0, 0))
@@ -159,63 +377,3 @@ class DisplayBoard(QWidget):
             painter.setPen(pen)
             for i in range(1, len(self.path_points)):
                 painter.drawLine(self.path_points[i - 1], self.path_points[i])
-
-
-# class MainWindow(QMainWindow):
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("Main Window")
-#         self.setGeometry(50, 50, 400, 300)
-#
-#         self.init_ui()
-#         self.line_widget = DisplayBoard()
-#         self.index = 0
-#
-#     def init_ui(self):
-#         button = QPushButton("Open LineWidget", self)
-#         button.clicked.connect(self.show_board)
-#
-#         button5 = QPushButton("Clear boundary point", self)
-#         button5.clicked.connect(self.clr_bnd_point)
-#
-#         button1 = QPushButton("Add boundary point", self)
-#         button1.clicked.connect(self.add_bnd_point)
-#
-#         button2 = QPushButton("Add new obstacle", self)
-#         button2.clicked.connect(self.add_new_obs)
-#
-#         button3 = QPushButton("Add obstacle point", self)
-#         button3.clicked.connect(self.add_obs_point)
-#
-#         central_widget = QWidget()
-#         layout = QVBoxLayout(central_widget)
-#         layout.addWidget(button)
-#         layout.addWidget(button5)
-#         layout.addWidget(button1)
-#         layout.addWidget(button2)
-#         layout.addWidget(button3)
-#         self.setCentralWidget(central_widget)
-#
-#     def clr_bnd_point(self):
-#         self.line_widget.clear_bnd_point()
-#
-#     def add_bnd_point(self):
-#         self.line_widget.add_bnd_point(self.index*10, int(math.sin(self.index)*50))
-#         self.index = self.index + 1
-#
-#     def add_new_obs(self):
-#         self.line_widget.add_new_obs()
-#
-#     def add_obs_point(self):
-#         self.line_widget.add_obs_point(self.index * 10, int(math.sin(self.index) * 50))
-#         self.index = self.index + 1
-#
-#     def show_board(self):
-#         self.line_widget.show()
-#
-#
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = MainWindow()
-#     main_window.show()
-#     sys.exit(app.exec())
