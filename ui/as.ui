@@ -884,7 +884,7 @@ QComboBox:pressed {
             </item>
             <item row="4" column="0">
              <property name="text">
-              <string>OFFSET PATHS</string>
+              <string>OFFSET PATH</string>
              </property>
             </item>
             <item row="4" column="1">

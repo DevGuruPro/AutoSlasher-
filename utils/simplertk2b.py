@@ -41,12 +41,13 @@ class GPS(QThread):
         line = self._ser.readline().decode('utf-8', errors='ignore').strip()
         if line.startswith('$GNGGA'):
             try:
+                logger.debug(line)
                 msg = pynmea2.parse(line)
                 for field in msg.fields:
                     label, attr = field[:2]
                     value = getattr(msg, attr)
                     self._data[attr] = value
-                # logger.debug(self._data)
+                logger.debug(f'gps-data : {self._data}')
                 self.sig_msg.emit(GPS_STAT_MSG[0])
             except pynmea2.ParseError as e:
                 logger.error(f"Parse error: {e}")

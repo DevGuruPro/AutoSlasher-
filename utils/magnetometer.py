@@ -2,7 +2,7 @@
 import time
 
 from utils.commons import calculate_heading, apply_calibration
-
+from utils.logger import logger
 
 class Magnetometer:
     def __init__(self, address=0x0C, bus_num=1):
@@ -11,7 +11,7 @@ class Magnetometer:
             self.bus = smbus.SMBus(bus_num)
             self.initialize_sensor()
         except Exception as e:
-            print(f"Failed to initialize Magnetometer: {e}")
+            logger.error(f"Failed to initialize Magnetometer: {e}")
 
     def initialize_sensor(self):
         try:
@@ -21,13 +21,13 @@ class Magnetometer:
             # Set measurement mode, change 0x01 to other values based on desired configuration
             self.write_byte(0x0A, 0x01)
         except Exception as e:
-            print(f"Error during sensor initialization: {e}")
+            logger.error(f"Error during sensor initialization: {e}")
 
     def write_byte(self, reg, value):
         try:
             self.bus.write_byte_data(self.address, reg, value)
         except Exception as e:
-            print(f"Failed to write byte to register {reg}: {e}")
+            logger.error(f"Failed to write byte to register {reg}: {e}")
 
     def read_two_bytes(self, lsb_reg, msb_reg):
         try:
@@ -38,7 +38,7 @@ class Magnetometer:
                 value -= 65536
             return value
         except Exception as e:
-            print(f"Failed to read two bytes from registers {lsb_reg} and {msb_reg}: {e}")
+            logger.error(f"Failed to read two bytes from registers {lsb_reg} and {msb_reg}: {e}")
             return None
 
     def read_heading(self):
@@ -52,7 +52,7 @@ class Magnetometer:
             heading = calculate_heading(calibrated_x, calibrated_y)
             return heading
         except Exception as e:
-            print(f"Failed to read heading: {e}")
+            logger.error(f"Failed to read heading: {e}")
             return None
 
     def __del__(self):

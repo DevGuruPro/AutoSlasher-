@@ -30,7 +30,7 @@ class AutoSlasher(QMainWindow):
         super().__init__()
         self.ui = Ui_AS()
         self.ui.setupUi(self)
-        self.showFullScreen()
+        # self.showFullScreen()
 
         self.loadingDlg = LoadingDlg(self)
         self.loadingDlg.hide()
@@ -212,6 +212,7 @@ class AutoSlasher(QMainWindow):
                     logger.error("Cannot get magnetometer data.")
                     continue
                 self.ui.displayWidget.set_location((x, y), heading)
+            time.sleep(0.1)
 
     def get_position(self):
         gps_data = self.gps.get_data()
