@@ -62,7 +62,7 @@ class AutoSlasher(QMainWindow):
         self.ui.nextPage.clicked.connect(self.to_next_page)
 
         # self.ui.settingTable.setFixedWidth(500)
-        self.ui.setting_table.setFixedHeight(463)
+        self.ui.setting_table.setFixedHeight(360)
         self.ui.setting_table.setColumnWidth(0, 800)
         self.ui.setting_table.setColumnWidth(1, 150)
         # self.ui.setting_table.setColumnWidth(2, 40)
@@ -90,7 +90,7 @@ class AutoSlasher(QMainWindow):
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # self.ui.field_table.setFixedWidth(500)
-        self.ui.field_table.setFixedHeight(463)
+        self.ui.field_table.setFixedHeight(363)
         self.ui.field_table.setColumnWidth(0, 800)
         self.ui.field_table.setColumnWidth(1, 200)
         self.ui.field_table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
@@ -152,10 +152,11 @@ class AutoSlasher(QMainWindow):
 
     def refresh_field_table(self):
         database = find_as_files()
+        row_count = 6
         self.ui.field_table.setRowCount(0)
-        self.ui.field_table.setRowCount(8)
-        start_idx = self.field_page_index * 8
-        for i in range(start_idx, min(start_idx+8, len(database))):
+        self.ui.field_table.setRowCount(row_count)
+        start_idx = self.field_page_index * row_count
+        for i in range(start_idx, min(start_idx+row_count, len(database))):
             self.ui.field_table.setItem(i-start_idx, 0, QTableWidgetItem(database[i][:-3]))
             btn = QToolButton(self)
             btn.setObjectName(u"del_btn")
@@ -203,7 +204,7 @@ class AutoSlasher(QMainWindow):
             layout1.addWidget(btn1)
             layout1.setContentsMargins(5, 5, 5, 5)
             self.ui.field_table.setCellWidget(i-start_idx, 1, container_widget1)
-        if start_idx+8 >= len(database):
+        if start_idx+row_count >= len(database):
             self.ui.nextPage.hide()
             return
 
