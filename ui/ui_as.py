@@ -1533,7 +1533,7 @@ class Ui_AS(object):
         ___qtablewidgetitem21 = self.setting_table.item(3, 1)
         ___qtablewidgetitem21.setText(QCoreApplication.translate("AS", u"MM", None));
         ___qtablewidgetitem22 = self.setting_table.item(3, 2)
-        ___qtablewidgetitem22.setText(QCoreApplication.translate("AS", u"1", None));
+        ___qtablewidgetitem22.setText(QCoreApplication.translate("AS", u"0", None));
         ___qtablewidgetitem23 = self.setting_table.item(4, 0)
         ___qtablewidgetitem23.setText(QCoreApplication.translate("AS", u"TRAVEL BOUNDARY", None));
         ___qtablewidgetitem24 = self.setting_table.item(5, 0)

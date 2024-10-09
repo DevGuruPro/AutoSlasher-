@@ -155,7 +155,7 @@ def generate_path(field_data, ma_width, offset_path):
     boundary_polygon = Polygon(field_data[0])
     obstacles_polygons = [Polygon(coords) for coords in field_data[1:]]
 
-    offset_distance = 10 * offset_path
+    offset_distance = 10
     sm_boundary_polygon = shrink_polygon_uniform(boundary_polygon, offset_distance)
 
     if sm_boundary_polygon:
@@ -166,7 +166,12 @@ def generate_path(field_data, ma_width, offset_path):
 
         # Step 4: Create coverage path
         covering_path = create_coverage_path(grid_points, obstacles_polygons, sm_boundary_polygon, grid_size)
-        return covering_path
+        path = []
+        for i in range(offset_path):
+            boundary_polygon = shrink_polygon_uniform(boundary_polygon, offset_distance)
+            if sm_boundary_polygon:
+                path = path + list(boundary_polygon.exterior.coords)
+        return path + covering_path
 
         # Step 5: Plot everything
         # plot_boundary_obstacles_path(boundary_polygon, sm_boundary_polygon, obstacles_polygons, covering_path)
