@@ -3,7 +3,7 @@ import os
 
 from pyproj import Transformer
 import numpy as np
-from shapely.geometry import Polygon, LineString, MultiPolygon
+from shapely.geometry import Polygon, Point, LineString, MultiPolygon
 import networkx as nx
 
 from settings import CALIBRATION, MAGNETIC_DECLINATION, DATABASE_PATH, MACHINE_WIDTH
@@ -75,20 +75,15 @@ def shrink_polygon_uniform(polygon, distance):
 
 def create_grid(boundary, obstacles, grid_size):
     min_x, min_y, max_x, max_y = boundary.bounds
-    x = np.arange(min_x, max_x, grid_size)
-    y = np.arange(min_y, max_y, grid_size)
+    x = np.arange(min_x, max_x + grid_size, grid_size)
+    y = np.arange(min_y, max_y + grid_size, grid_size)
     grid_points = []
 
     for i in x:
         for j in y:
-            cell = Polygon([
-                (i, j),
-                (i + grid_size, j),
-                (i + grid_size, j + grid_size),
-                (i, j + grid_size)
-            ])
-            if boundary.contains(cell) and all(not cell.intersects(obs) for obs in obstacles):
-                grid_points.append((i + grid_size / 2, j + grid_size / 2))
+            point = (i, j)
+            if boundary.contains(Point(point)) and all(not obs.contains(Point(point)) for obs in obstacles):
+                grid_points.append(point)
 
     return grid_points
 
@@ -100,19 +95,19 @@ def is_visible(point1, point2, obstacles, boundary):
         return False
 
     for obs in obstacles:
-        if line.intersects(obs):
+        if line.crosses(obs) or line.within(obs):
             return False
 
     return True
 
 
 def create_visibility_graph(grid_points, obstacles, boundary):
-    graph = nx.Graph()
+    gg = nx.Graph()
     for p1 in grid_points:
         for p2 in grid_points:
             if p1 != p2 and is_visible(p1, p2, obstacles, boundary):
-                graph.add_edge(p1, p2, weight=np.linalg.norm(np.array(p1) - np.array(p2)))
-    return graph
+                gg.add_edge(p1, p2, weight=np.linalg.norm(np.array(p1) - np.array(p2)))
+    return gg
 
 
 def find_path(graph, start, end):
@@ -123,61 +118,114 @@ def find_path(graph, start, end):
         return []
 
 
-def create_coverage_path(grid_points, obstacles, boundary, grid_size):
-    graph = create_visibility_graph(grid_points, obstacles, boundary)
+def create_coverage_path(grid_points, obstacles, boundary, gg=None):
+    if gg is None:
+        gg = create_visibility_graph(grid_points, obstacles, boundary)
     path = []
     visited = set()
 
-    num_columns = int(
-        (max(grid_points, key=lambda x: x[0])[0] - min(grid_points, key=lambda x: x[0])[0]) / grid_size) + 1
+    # Sort grid points for coverage path planning
+    sorted_points = sorted(grid_points, key=lambda pp: (pp[0], pp[1]))
+    columns = {}
+    for p in sorted_points:
+        columns.setdefault(p[0], []).append(p)
 
-    for i in range(num_columns):
-        column_x = min(grid_points, key=lambda x: x[0])[0] + i * grid_size
-        column_points = [p for p in grid_points if abs(p[0] - column_x) < grid_size / 2]
-        column_points = sorted(column_points, key=lambda x: x[1])
+    columns = dict(sorted(columns.items()))
+    column_keys = list(columns.keys())
 
-        if i % 2 == 1:
-            column_points.reverse()
-
-        for j in range(len(column_points)):
-            if column_points[j] not in visited:
+    for idx, x in enumerate(column_keys):
+        column_points = columns[x]
+        column_points.sort(key=lambda pp: pp[1], reverse=idx % 2 == 1)
+        for point in column_points:
+            if point not in visited:
                 if path:
-                    part_path = find_path(graph, path[-1], column_points[j])
-                    path.extend(part_path[1:] if part_path else [])
+                    part_path = find_path(gg, path[-1], point)
+                    if part_path:
+                        path.extend(part_path[1:])
+                    else:
+                        path.append(point)
                 else:
-                    path.append(column_points[j])
-                visited.add(column_points[j])
+                    path.append(point)
+                visited.add(point)
 
     return path
+
+
+def generate_offset_paths(boundary_polygon, obstacles_polygons, num_offsets, grid_size):
+    offset_paths = []
+
+    for i in range(1, num_offsets + 1):
+        offset_distance = -i * grid_size
+        offset_polygon = boundary_polygon.buffer(offset_distance)
+
+        if not offset_polygon.is_empty and isinstance(offset_polygon, (Polygon, MultiPolygon)):
+            if isinstance(offset_polygon, MultiPolygon):
+                offset_polygon = max(offset_polygon.geoms, key=lambda p: p.area)
+
+            for obs in obstacles_polygons:
+                offset_polygon = offset_polygon.difference(obs)
+
+            if isinstance(offset_polygon, Polygon):
+                offset_coords = list(offset_polygon.exterior.coords)
+                offset_paths.append(offset_coords)
+            elif isinstance(offset_polygon, MultiPolygon):
+                for poly in offset_polygon.geoms:
+                    offset_coords = list(poly.exterior.coords)
+                    offset_paths.append(offset_coords)
+        else:
+            print(f"Offset {i} is invalid or empty.")
+
+    return offset_paths
 
 
 def generate_path(field_data, ma_width, offset_path):
     boundary_polygon = Polygon(field_data[0])
     obstacles_polygons = [Polygon(coords) for coords in field_data[1:]]
 
-    offset_distance = 10
-    sm_boundary_polygon = shrink_polygon_uniform(boundary_polygon, offset_distance)
+    grid_size = int(15 * ma_width / MACHINE_WIDTH)  # Adjust as needed
 
-    if sm_boundary_polygon:
-        # Step 3: Create grid
-        grid_size = int(15 * ma_width / MACHINE_WIDTH)  # Adjust as needed
-        print(grid_size, offset_distance)
-        grid_points = create_grid(sm_boundary_polygon, obstacles_polygons, grid_size)
+    coverage_segments = []
+    all_points = set()
 
-        # Step 4: Create coverage path
-        covering_path = create_coverage_path(grid_points, obstacles_polygons, sm_boundary_polygon, grid_size)
-        path = []
-        for i in range(offset_path):
-            boundary_polygon = shrink_polygon_uniform(boundary_polygon, offset_distance)
-            if sm_boundary_polygon:
-                path = path + list(boundary_polygon.exterior.coords)
-        return path + covering_path
+    # Generate offset paths
+    if offset_path > 0:
+        offset_paths = generate_offset_paths(boundary_polygon, obstacles_polygons, offset_path, grid_size)
+        for offset_coords in offset_paths:
+            coverage_segments.append(offset_coords)
+            all_points.update(offset_coords)
 
-        # Step 5: Plot everything
-        # plot_boundary_obstacles_path(boundary_polygon, sm_boundary_polygon, obstacles_polygons, covering_path)
-    else:
-        logger.error("Failed to create a valid smaller boundary.")
-        return None
+    # Step 3: Create grid within original boundary
+    grid_points = create_grid(boundary_polygon, obstacles_polygons, grid_size)
+    all_points.update(grid_points)
+
+    # Now, create visibility graph over all_points
+    all_points = list(all_points)  # Convert to list
+    gg = create_visibility_graph(all_points, obstacles_polygons, boundary_polygon)
+
+    # Step 4: Create coverage path
+    grid_coverage_path = create_coverage_path(grid_points, obstacles_polygons, boundary_polygon, gg)
+    coverage_segments.append(grid_coverage_path)
+
+    # Now, build the final coverage path by connecting segments
+    coverage_path = []
+
+    for i in range(len(coverage_segments)):
+        segment = coverage_segments[i]
+        if i == 0:
+            coverage_path.extend(segment)
+        else:
+            # Find path from last point of previous segment to first point of current segment
+            start_point = coverage_path[-1]
+            end_point = segment[0]
+            if start_point != end_point:
+                transition_path = find_path(gg, start_point, end_point)
+                if transition_path:
+                    coverage_path.extend(transition_path[1:])  # Exclude the first point
+                else:
+                    print(f"No path found between segment {i - 1} and segment {i}. Adding direct connection.")
+                    coverage_path.append(end_point)
+            coverage_path.extend(segment)
+    return coverage_path
 
 
 def apply_calibration(x, y, z):
