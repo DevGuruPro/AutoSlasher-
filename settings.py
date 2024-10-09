@@ -44,6 +44,7 @@ CALIBRATION = {
 
 MAGNETIC_DECLINATION = 0.0
 POSITION_TOLERANCE = 1.0
+MACHINE_WIDTH = 900
 
 try:
     from local_settings import *

@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/">
+    <file>img/delete.png</file>
+    <file>img/regenerate.png</file>
     <file>img/zin.png</file>
     <file>img/fit.png</file>
     <file>img/zout.png</file>

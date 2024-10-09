@@ -1,3 +1,4 @@
+import os
 import sys
 import threading
 
@@ -6,8 +7,10 @@ import time
 from typing import List, Tuple
 
 from PySide6 import QtCore
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QHeaderView
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QFont, QCursor, QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QHeaderView, QCheckBox, QWidget, \
+    QHBoxLayout, QComboBox, QToolButton, QAbstractItemView
 
 from settings import SERIAL_PORT, BAUD_RATE, POSITION_TOLERANCE, DATABASE_PATH, GPS_STAT_MSG
 from ui.ui_as import Ui_AS
@@ -31,6 +34,8 @@ class AutoSlasher(QMainWindow):
         self.ui = Ui_AS()
         self.ui.setupUi(self)
         self.showFullScreen()
+
+        self.del_btn = []
 
         self.loadingDlg = LoadingDlg(self)
         self.loadingDlg.hide()
@@ -56,16 +61,39 @@ class AutoSlasher(QMainWindow):
         self.ui.prevPage.clicked.connect(self.to_prev_page)
         self.ui.nextPage.clicked.connect(self.to_next_page)
 
-        self.ui.settingTable.setFixedWidth(500)
-        self.ui.settingTable.setFixedHeight(400)
-        self.ui.settingTable.setColumnWidth(0, 250)
-        self.ui.settingTable.setColumnWidth(1, 60)
-        self.ui.settingTable.setColumnWidth(2, 40)
+        # self.ui.settingTable.setFixedWidth(500)
+        self.ui.setting_table.setFixedHeight(463)
+        self.ui.setting_table.setColumnWidth(0, 800)
+        self.ui.setting_table.setColumnWidth(1, 150)
+        # self.ui.setting_table.setColumnWidth(2, 40)
 
-        self.ui.field_table.setFixedWidth(500)
-        self.ui.field_table.setFixedHeight(400)
-        self.ui.field_table.setColumnWidth(0, 200)
-        self.ui.field_table.setColumnWidth(1, 98)
+        cell_widget = QWidget()
+        combo_box = QComboBox()
+        combo_box.addItems(["NO", "YES"])
+        combo_box.setMinimumWidth(80)
+        font = QFont()
+        font.setPointSize(24)  # Set the desired font size
+        combo_box.setFont(font)
+        layout_inner = QHBoxLayout(cell_widget)
+        layout_inner.addWidget(combo_box)
+        layout_inner.setAlignment(combo_box, Qt.AlignmentFlag.AlignCenter)  # Center the checkbox
+        layout_inner.setContentsMargins(5, 5, 5, 5)  # Remove margins
+        self.ui.setting_table.setCellWidget(4, 2, cell_widget)
+        self.ui.setting_table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+
+        for row in range(self.ui.setting_table.rowCount()):
+            item = self.ui.setting_table.item(row, 1)
+            if item:
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            item = self.ui.setting_table.item(row, 2)
+            if item:
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # self.ui.field_table.setFixedWidth(500)
+        self.ui.field_table.setFixedHeight(463)
+        self.ui.field_table.setColumnWidth(0, 800)
+        self.ui.field_table.setColumnWidth(1, 200)
+        self.ui.field_table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
 
         self.ui.settingPage.hide()
         self.ui.fmanagerPage.hide()
@@ -78,6 +106,7 @@ class AutoSlasher(QMainWindow):
         self._moving_stop = False
         self.current_filename = ''
         self.is_showing_board = False
+        self.field_page_index = 0
         # self.focal = None
 
         self.gps = GPS(port=SERIAL_PORT, baud_rate=BAUD_RATE)
@@ -90,6 +119,7 @@ class AutoSlasher(QMainWindow):
         self.current_location_thread.start()
 
         self.compass = Magnetometer()
+        # self.to_start_page()
 
     def hide_all_widget(self):
         self.ui.startPage.hide()
@@ -120,15 +150,78 @@ class AutoSlasher(QMainWindow):
         self.ui.startPage.hide()
         self.ui.settingPage.show()
 
+    def refresh_field_table(self):
+        database = find_as_files()
+        self.ui.field_table.setRowCount(0)
+        self.ui.field_table.setRowCount(8)
+        start_idx = self.field_page_index * 8
+        for i in range(start_idx, min(start_idx+8, len(database))):
+            self.ui.field_table.setItem(i-start_idx, 0, QTableWidgetItem(database[i][:-3]))
+            btn = QToolButton(self)
+            btn.setObjectName(u"del_btn")
+            btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            btn.setAutoRaise(True)
+            btn.setStyleSheet("""  
+                                   QToolButton {  
+                                       background-color: transparent;  
+                                       border: none;  
+                                   }  
+                                   QToolButton:hover {  
+                                       background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                   }  
+                               """)
+            icon = QIcon()
+            icon.addFile(u":/img/regenerate.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            btn.setIcon(icon)
+            btn.setIconSize(QSize(40, 40))
+            btn.clicked.connect(lambda checked, row=i: self.regenerate_btn_clicked(row))
+            container_widget = QWidget()
+            layout = QHBoxLayout(container_widget)
+            layout.addWidget(btn)
+            layout.setContentsMargins(5, 5, 5, 5)
+            self.ui.field_table.setCellWidget(i-start_idx, 2, container_widget)
+            btn1 = QToolButton(self)
+            btn1.setObjectName(u"del_btn")
+            btn1.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            btn1.setAutoRaise(True)
+            btn1.setStyleSheet("""  
+                                               QToolButton {  
+                                                   background-color: transparent;  
+                                                   border: none;  
+                                               }  
+                                               QToolButton:hover {  
+                                                   background-color: rgba(255, 255, 255, 50);  // Example of a slight hover effect  
+                                               }  
+                                           """)
+            icon1 = QIcon()
+            icon1.addFile(u":/img/delete.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            btn1.setIcon(icon1)
+            btn1.setIconSize(QSize(40, 40))
+            btn1.clicked.connect(lambda checked, row=i: self.del_btn_clicked(row))
+            container_widget1 = QWidget()
+            layout1 = QHBoxLayout(container_widget1)
+            layout1.addWidget(btn1)
+            layout1.setContentsMargins(5, 5, 5, 5)
+            self.ui.field_table.setCellWidget(i-start_idx, 1, container_widget1)
+        if start_idx+8 >= len(database):
+            self.ui.nextPage.hide()
+            return
+
     def to_field_manager_page(self):
         self.is_showing_board = False
-        database = find_as_files()
-        for i in range(len(database)):
-            self.ui.field_table.setItem(i, 0, QTableWidgetItem(database[i][:-3]))
+        # for row in range(self.ui.field_table.rowCount()):
+        #     for col in range(self.ui.field_table.columnCount()):
+        #         item = self.ui.field_table.item(row, col)
+        #         if item is not None:
+        #             item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+
         self.ui.startPage.hide()
         self.ui.fieldPage.hide()
         self.ui.fmanagerPage.show()
         self.ui.movingPage.show()
+        self.ui.nextPage.show()
+        self.field_page_index = 0
+        self.refresh_field_table()
 
     def to_record_field_page(self):
         self.is_showing_board = True
@@ -146,8 +239,7 @@ class AutoSlasher(QMainWindow):
         self.field_data.append([])
         self.waypoint.clear()
 
-    def to_open_field_page(self):
-        print(self.gps.isRunning())
+    def to_open_field_page(self, is_regenerate):
         self.is_showing_board = True
         self.ui.startPage.hide()
         self.ui.movingPage.hide()
@@ -161,9 +253,9 @@ class AutoSlasher(QMainWindow):
         self.ui.positionWidget.hide()
         self.ui.recordWidget.hide()
 
-        self.current_filename = self.ui.combo_field.currentText() + '.as'
-        logger.info(self.current_filename)
-        self.load_file()
+        if not is_regenerate:
+            self.current_filename = self.ui.combo_field.currentText() + '.as'
+        self.load_file(is_regenerate)
 
     def to_prev_page(self):
         if self.ui.startPage.isVisible():
@@ -172,7 +264,7 @@ class AutoSlasher(QMainWindow):
         elif self.ui.settingPage.isVisible() or self.ui.fmanagerPage.isVisible():
             self.to_start_page()
         elif self.ui.positionWidget.isVisible():
-            self.to_open_field_page()
+            self.to_open_field_page(False)
 
     def discard_field(self):
         self.ui.sureWidget.show()
@@ -184,11 +276,35 @@ class AutoSlasher(QMainWindow):
         self.ui.sureWidget.hide()
 
     def to_next_page(self):
+        self.field_page_index = self.field_page_index + 1
+        self.refresh_field_table()
         pass
+
+    def del_btn_clicked(self, row):
+        database = find_as_files()
+        file_path = DATABASE_PATH + '/' + database[row]
+        if os.path.exists(file_path):
+            # Attempt to delete the file
+            try:
+                os.remove(file_path)
+                logger.info(f"File '{file_path}' has been deleted successfully.")
+            except Exception as e:
+                logger.error(f"Error deleting file '{file_path}': {e}")
+        else:
+            logger.error(f"File '{file_path}' does not exist.")
+        self.refresh_field_table()
+
+    def regenerate_btn_clicked(self, row):
+        database = find_as_files()
+        self.current_filename = database[row]
+        self.to_open_field_page(True)
 
     def on_start_button(self):
         if self.ui.startButtons.isVisible():
-            self.to_open_field_page()
+            self.field_data.clear()
+            self.waypoint.clear()
+            self.ui.displayWidget.clear()
+            self.to_open_field_page(False)
         else:
             self.to_start_page()
 
@@ -258,9 +374,11 @@ class AutoSlasher(QMainWindow):
         else:
             logger.error("Cannot get gps data.")
 
-    def load_file(self):
+    def load_file(self, is_regenerate):
+        print(is_regenerate)
         self.field_data.clear()
         self.waypoint.clear()
+        self.ui.displayWidget.clear()
         filename = DATABASE_PATH + '/' + self.current_filename
         logger.info(f'Loading {filename}...')
         with open(filename, 'r') as file:
@@ -273,6 +391,8 @@ class AutoSlasher(QMainWindow):
                         self.field_data.append(current_list)
                     current_list = []
                     if line == 'PATH':
+                        if is_regenerate:
+                            break
                         is_path = True
                 else:
                     line = line.strip('()')
@@ -296,11 +416,17 @@ class AutoSlasher(QMainWindow):
             self.ui.displayWidget.load_field_data(self.field_data, self.waypoint)
 
     def set_generated_path(self, filename):
-        self.waypoint = generate_path(self.field_data)
-        with open(filename, 'a') as file:
-            file.write('PATH\n')
-            for i in range(len(self.waypoint)):
-                file.write(f"{self.waypoint[i]}\n")
+        ma_width = int(self.ui.setting_table.item(2, 2).text())
+        offset = int(self.ui.setting_table.item(3, 2).text())
+        self.waypoint = generate_path(self.field_data, ma_width, offset)
+        combo_box = self.ui.setting_table.cellWidget(4, 2).layout().itemAt(0).widget()
+        selected_text = combo_box.currentText()
+        print(f"Selected Text: {selected_text}")
+        if selected_text == "YES":
+            arr = self.field_data[0]
+            arr.append(self.field_data[0][0])
+            self.waypoint = arr + self.waypoint
+        self.save_database(filename)
         self.ui.displayWidget.load_field_data(self.field_data, self.waypoint)
         self.loadingDlg.close()
         self.ui.guidWidget.setEnabled(True)
@@ -312,11 +438,18 @@ class AutoSlasher(QMainWindow):
             return
         filename = name_dlg.get_name() + ".as"
         logger.debug(f"File name : {filename}")
+        self.save_database(filename)
+
+    def save_database(self, filename):
         with open(filename, 'w') as file:
             for i in range(len(self.field_data)):
                 file.write('###\n')
                 for j in range(len(self.field_data[i])):
                     file.write(f"{self.field_data[i][j]}\n")
+            if len(self.waypoint):
+                file.write('PATH\n')
+            for i in range(len(self.waypoint)):
+                file.write(f"{self.waypoint[i]}\n")
 
     def show_gps_status(self, status):
         logger.info(f'STAT:{status}')

@@ -6,7 +6,7 @@ import numpy as np
 from shapely.geometry import Polygon, LineString, MultiPolygon
 import networkx as nx
 
-from settings import CALIBRATION, MAGNETIC_DECLINATION, DATABASE_PATH
+from settings import CALIBRATION, MAGNETIC_DECLINATION, DATABASE_PATH, MACHINE_WIDTH
 from utils.logger import logger
 
 
@@ -151,16 +151,17 @@ def create_coverage_path(grid_points, obstacles, boundary, grid_size):
     return path
 
 
-def generate_path(field_data):
+def generate_path(field_data, ma_width, offset_path):
     boundary_polygon = Polygon(field_data[0])
     obstacles_polygons = [Polygon(coords) for coords in field_data[1:]]
 
-    offset_distance = 10
+    offset_distance = 10 * offset_path
     sm_boundary_polygon = shrink_polygon_uniform(boundary_polygon, offset_distance)
 
     if sm_boundary_polygon:
         # Step 3: Create grid
-        grid_size = 10  # Adjust as needed
+        grid_size = int(15 * ma_width / MACHINE_WIDTH)  # Adjust as needed
+        print(grid_size, offset_distance)
         grid_points = create_grid(sm_boundary_polygon, obstacles_polygons, grid_size)
 
         # Step 4: Create coverage path
