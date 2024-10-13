@@ -434,14 +434,17 @@ class AutoSlasher(QMainWindow):
 
     def save_file(self):
         name_dlg = NameDlg(self)
-        if name_dlg.exec() != QDialog.accepted:
+        if name_dlg.exec() != QDialog.DialogCode.Accepted:
             logger.info("Name Input Dialog Closed.")
             return
         filename = name_dlg.get_name() + ".as"
         logger.debug(f"File name : {filename}")
         self.save_database(filename)
+        self.to_field_manager_page()
 
     def save_database(self, filename):
+        filename = DATABASE_PATH + '/' + filename
+        print(filename)
         with open(filename, 'w') as file:
             for i in range(len(self.field_data)):
                 file.write('###\n')
